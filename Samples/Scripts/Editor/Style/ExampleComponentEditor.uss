@@ -1,0 +1,202 @@
+﻿/* --------------------------------------------------------
+   CLASS                                        --
+   ----------------------------------------------------- */
+
+/* --------------------------------- */
+/* Container ----------------------- */
+/*<editor-fold desc="Container">*/
+
+.exampleInspectorContainer {
+
+}
+
+.playerDetailsRowContainer {
+    background-color: #282828;
+    padding-left: 4px;
+}
+
+.detailsHolder{
+    font-size: 13px;
+    padding: 5px;
+    flex-shrink: 0;
+}
+
+.playerDetailsLabel {
+
+}
+
+/* Details */
+
+.characterDetailsFoldout {
+    padding-left: 3px;
+    background-color: #303030;
+    padding-bottom: 3px;
+    align-content: center;
+}
+
+.characterDetailsFoldout .animatedFoldoutLabel {
+    padding: 5px;
+}
+
+.characterDetailsFoldout Toggle {
+    padding-left: 3px;
+    background-color: #262626;
+}
+
+.characterDetailsRow {
+    flex-shrink: 0;
+}
+
+/*  Character Name Row ----------*/
+.nameContainer {
+    flex-direction: row;
+}
+
+.nameLabel {
+    min-width: 100px;
+}
+
+.exampleCharacterName {
+    flex-grow: 1;
+}
+
+
+/* Location Row -------------------*/
+.locationContainer {
+    flex-direction: row;
+}
+
+.locationLabel {
+    min-width: 100px;
+}
+
+.exampleLocation {
+    flex-grow: 1;
+}
+
+
+/* Vitals ------------------------------*/
+.characterVitalsFoldout {
+    padding-left: 3px;
+    background-color: #303030;
+    padding-bottom: 3px;
+}
+
+.characterVitalsFoldout .animatedFoldoutLabel {
+    padding: 5px;
+}
+
+.characterVitalsFoldout Toggle {
+    padding-left: 3px;
+    background-color: #262626;
+}
+
+/* Health ------*/
+.healthContainer {
+    flex-direction: row;
+}
+
+.healthLabel {
+    min-width: 100px;
+}
+
+.exampleHealth {
+    flex-grow: 1;
+}
+
+/* Mana ------*/
+.manaContainer {
+    flex-direction: row;
+}
+
+
+.manaLabel {
+    min-width: 100px;
+}
+
+.exampleMana {
+    flex-grow: 1;
+}
+
+/* Lives ------*/
+.livesContainer {
+    flex-direction: row;
+}
+
+.livesLabel {
+    min-width: 100px;
+}
+
+.exampleLives {
+    flex-grow: 1;
+}
+
+
+.characterWeaponListFoldout {
+    padding-left: 3px;
+    background-color: #303030;
+    padding-bottom: 3px;
+    margin-bottom: 4px;
+}
+
+.characterWeaponListFoldout .animatedFoldoutLabel {
+    padding: 5px;
+}
+
+.characterWeaponListFoldout Toggle {
+    padding-left: 3px;
+    background-color: #262626;
+}
+
+.exampleWeaponList {
+}
+
+.examplePlayerModel {
+}
+
+.examplePlayerModel {
+}
+
+.exampleIsNPC {
+}
+
+.exampleSpawnLocation {
+}
+
+.characterDetailsFoldout {
+}
+
+.characterDetailsFoldout {
+}
+
+.characterDetailsFoldout {
+}
+
+
+/*</editor-fold> Container*/
+
+
+/* -------------------------------- */
+/* Unity default Overrides -------- */
+/*<editor-fold desc="UnityDefaults">*/
+
+.unity-scroll-view {
+    flex: 1 0 0;
+}
+
+.unity-box {
+    flex: 1 0 0;
+    margin-top: 0px;
+    margin-bottom: 0px;
+    margin-right: 0px;
+    margin-left: 0px;
+}
+
+.unity-popup-window {
+    padding-top: 5px;
+    padding-left: 10px;
+    padding-right: 10px;
+    padding-bottom: 12px;
+}
+
+/*</editor-fold>*/

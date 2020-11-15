@@ -1,0 +1,392 @@
+﻿/* ----------------------------------------------------------------------------
+// -- Project : https://github.com/instance-id/UIElementsAnimation           --
+// -- instance.id 2020 | http://github.com/instance-id | http://instance.id  --
+// --- UIElementsAnimationEditor.uss --------------------------------------- */
+
+/* --------------------------------- */
+/* Editor Main Window -------------- */
+/*<editor-fold desc="Editor">*/
+
+/* Shared -------------------------- */
+.rightEdgePadding {
+    padding-right: 3px;
+}
+
+.animatedLabelContainer {
+}
+
+
+/* Container ----------------------- */
+.elementScroller {
+}
+
+.toolbar {
+    background-color: #303030;
+}
+
+.mainMenu {
+    width: 80px;
+    padding-left: 6px;
+    background-color: #303030;
+}
+
+/* Toolbar ------------------------- */
+.toolbarSpacer {
+    background-color: #303030;
+}
+
+.menuInfoParent{
+    flex-direction: row;
+}
+
+.menuInfoContainer {
+    display: none;
+    width: 1;
+    flex-direction: row;
+    background-color: #303030;
+    align-self: center;
+    justify-content: space-between;
+    -unity-text-align: middle-center;
+    padding: 3px 6px;
+} /*@formatter:off*/
+.discordLabel{
+    margin-right: 2px;
+}
+.docsLabel{}
+
+
+.menuInfoToggle {
+    display: none;
+}
+
+
+/*Toolbar Info @formatter:on*/
+.toolbarInfo {
+    background-color: #303030;
+    width: auto;
+    align-self: center;
+    -unity-text-align: middle-center;
+    margin-left: 5px;
+    margin-right: 2px;
+    border-left-width: 2px;
+    border-right-width: 2px;
+    border-left-color: initial;
+}
+
+
+/* Header Row  --------------------- */
+.headerRowContainer {
+    flex-direction: row;
+    background-color: rgb(39, 39, 39);
+    font-size: 13px;
+}
+
+.headerActionLabel {
+    padding: 5px;
+    border-right-width: 1px;
+    border-right-color: rgb(68, 68, 68);
+}
+
+.headerDetailsLabel {
+    padding: 5px;
+}
+
+.headerSpacer {
+    flex-grow: 1;
+    border-right-width: 1px;
+    border-right-color: rgb(68, 68, 68);
+}
+
+.headerJumpToCodeLabel {
+    padding: 5px;
+} /* @formatter:off */
+
+/* Nested Info Column  @formatter:on */
+.nestedInfoColumn {
+    justify-content: space-between;
+    align-self: stretch;
+}
+
+/* Nested Info --------------------- */
+.infoContainer {
+    flex-direction: row;
+    align-self: flex-end;
+    font-size: 24px;
+}
+
+/* @InstanceIdLabel ----------------- */
+.instanceidLabel {
+    padding: 0;
+    margin: 0;
+    align-self: auto;
+    white-space: initial;
+    font-size: 22px;
+}
+
+/* @ImageAnimation ----------------- */
+.imageAnimationContainer {
+    flex-direction: row;
+    align-items: center;
+    margin: 2px;
+    border-left-width: 4px;
+    border-right-width: 4px;
+    background-color: initial;
+    flex-grow: 1;
+}
+
+.imageAnimationButton {
+    border-width: 0;
+    border-radius: 0;
+    background-color: initial;
+    -unity-background-image-tint-color: black;
+}
+
+.imageAnimationLabelColumn {
+    justify-content: space-between;
+    align-self: stretch;
+    flex-grow: 1;
+    padding-right: 2px;
+}
+
+/* @AnimatedFoldout ----------------- */
+.imageAnimationAnimatedFoldout {
+    background-color: #303030;
+}
+
+.foldoutLabelContainer {
+    padding: 6px;
+    justify-content: space-between;
+    flex-shrink: 0;
+    flex-basis: auto;
+    border-left-width: 4px;
+    border-right-width: 4px;
+    background-color: initial;
+}
+
+.foldoutLabel1Container {
+    flex-direction: row;
+    flex-basis: auto;
+}
+
+.foldoutLabel2Container {
+    flex-direction: row;
+    flex-basis: auto;
+}
+
+.foldoutLabel1 {
+    padding: 0;
+    margin: 0;
+    flex-basis: auto;
+}
+
+.foldoutLabel2 {
+    padding: 0;
+    margin: 0;
+    flex-basis: auto;
+}
+
+.imageAnimationAnimatedFoldout #expandContainer {
+    background-color: #232323;
+}
+
+.imageAnimationLabel {
+    align-self: flex-start;
+}
+
+.imageAnimationSpacer {
+    flex-grow: 0;
+    display: none;
+}
+
+.imageAnimationButtonContainer {
+    flex-direction: row;
+    align-self: flex-end;
+}
+
+.imageAnimationEditorButton {
+    margin: 0;
+}
+
+.imageAnimationAnimButton {
+    margin: 0;
+}
+
+.imageAnimationUSSButton {
+    margin: 0;
+}
+
+/* @FadeTextAnimation -------------- */
+.fadeTextAnimationContainer {
+    flex-direction: row;
+    align-items: center;
+    margin: 2px;
+    border-left-width: 4px;
+    border-right-width: 4px;
+    background-color: initial;
+}
+
+/*@formatter:off*/
+.fadeTextAnimationButton{}
+.fadeTextAnimationLabel{}
+.fadeTextAnimationSpacer{
+    flex-grow: 1;
+}
+
+/*@formatter:on*/
+.fadeTextAnimationButtonContainer {
+    flex-direction: row;
+}
+
+.fadeTextAnimationEditorButton {
+    margin: 0;
+}
+
+.fadeTextAnimationAnimButton {
+    margin: 0;
+}
+
+.fadeTextAnimationUSSButton {
+    margin: 0;
+}
+
+/* @FadeColorAnimation ------------- */
+.fadeColorAnimationContainer {
+    flex-direction: row;
+    align-items: center;
+    margin: 2px;
+    border-left-width: 4px;
+    border-right-width: 4px;
+    background-color: initial;
+}/*@formatter:off*/
+.fadeColorAnimationButton{}
+.fadeColorAnimationLabel{}
+.fadeColorAnimationSpacer{
+    flex-grow: 1;
+}
+
+/*@formatter:on*/
+.fadeColorButtonContainer {
+    flex-direction: row;
+}
+
+.fadeColorAnimationEditorButton {
+    margin: 0;
+}
+
+.fadeColorAnimationAnimButton {
+    margin: 0;
+}
+
+.fadeColorAnimationUSSButton {
+    margin: 0;
+}
+
+/* @WidthChangeAnimation ----------- */
+.widthChangeAnimationContainer {
+    flex-direction: row;
+    align-items: center;
+    margin: 2px;
+    border-left-width: 4px;
+    border-right-width: 4px;
+    background-color: initial;
+}
+
+.widthChangeAnimationButton {
+}
+
+.widthChangeAnimationLabel {
+    justify-content: center;
+    border-color: initial;
+    border-width: 1px;
+}
+
+.widthChangeAnimationSpacer {
+    flex-grow: 1;
+}
+
+.widthChangeAnimationButtonContainer {
+    flex-direction: row;
+}
+
+.widthChangeAnimationEditorButton {
+    margin: 0;
+}
+
+.widthChangeAnimationAnimButton {
+    margin: 0;
+}
+
+.widthChangeAnimationUSSButton {
+    margin: 0;
+}
+
+/* @HeightChangeAnimation ---------- */
+.heightChangeAnimationContainer {
+    flex-direction: row;
+    align-items: center;
+    margin: 2px;
+    border-left-width: 4px;
+    border-right-width: 4px;
+    background-color: initial;
+}
+
+.heightChangeAnimationButton {
+}
+
+.heightChangeAnimationLabel {
+    -unity-text-align: middle-center;
+    justify-content: center;
+    border-width: 1px;
+    border-color: initial;
+}
+
+.heightChangeAnimationSpacer {
+    flex-grow: 1;
+}
+
+.heightChangeAnimationButtonContainer {
+    flex-direction: row;
+}
+
+.heightChangeAnimationEditorButton {
+    margin: 0;
+}
+
+.heightChangeAnimationAnimButton {
+    margin: 0;
+}
+
+.heightChangeAnimationUSSButton {
+    margin: 0;
+}
+
+
+.elementScroller {
+}
+
+/*</editor-fold> Container*/
+
+/* --------------------------------- */
+/* Unity default Overrides --------- */
+/*<editor-fold desc="UnityDefaults">*/
+
+.unity-scroll-view {
+    flex: 1 0 0;
+}
+
+.unity-box {
+    flex: 1 0 0;
+    margin-top: 0px;
+    margin-bottom: 0px;
+    margin-right: 0px;
+    margin-left: 0px;
+}
+
+.unity-popup-window {
+    padding-top: 5px;
+    padding-left: 10px;
+    padding-right: 10px;
+    padding-bottom: 12px;
+}
+
+/*</editor-fold>*/

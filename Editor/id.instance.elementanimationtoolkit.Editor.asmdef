@@ -1,0 +1,17 @@
+{
+    "name": "id.instance.elementanimationtoolkit.Editor",
+    "references": [
+        "id.instance.elementanimationtoolkit"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
