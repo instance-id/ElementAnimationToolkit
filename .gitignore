@@ -9,6 +9,7 @@
 /[Bb]uilds/
 /[Ll]ogs/
 /[Mm]emoryCaptures/
+/[Aa]ssetStoreTools/
 
 # Never ignore Asset meta data
 !/[Aa]ssets/**/*.meta
@@ -61,3 +62,47 @@ sysinfo.txt
 # Crashlytics generated file
 crashlytics-build.properties
 
+.idea/
+/ProjectSettings/NavMeshAreas.asset
+/ProjectSettings/ClusterInputManager.asset
+/ProjectSettings/UnityConnectSettings.asset
+/ProjectSettings/QualitySettings.asset
+/ProjectSettings/DynamicsManager.asset
+/ProjectSettings/ProjectSettings.asset
+/ProjectSettings/PresetManager.asset
+/ProjectSettings/XRSettings.asset
+/ProjectSettings/InputManager.asset
+/ProjectSettings/VFXManager.asset
+/ProjectSettings/AudioManager.asset
+/ProjectSettings/TimeManager.asset
+/ProjectSettings/EditorBuildSettings.asset
+/ProjectSettings/GraphicsSettings.asset
+/ProjectSettings/TagManager.asset
+/ProjectSettings/PackageManagerSettings.asset
+/ProjectSettings/EditorSettings.asset
+/ProjectSettings/Physics2DSettings.asset
+/Assets/Standard Assets/
+/Assets/Standard Assets.meta
+/Assets/HierarchyHeaderSettings.asset
+/Assets/HierarchyHeaderSettings.asset.meta
+/Assets/Research/
+/Assets/Research.meta
+/Assets/Profiles/
+/Assets/Profiles.meta
+/Assets/Scenes/
+/Assets/Scenes.meta
+/Assets/AssetStoreTools/
+/Assets/AssetStoreTools.meta
+/Assembly-CSharp-Editor.csproj
+/Assembly-CSharp-firstpass.csproj
+/Assembly-CSharp.csproj
+/AV.Editor.Hierarchy.csproj
+/com.id.instance.hierarchyheader.csproj
+/com.id.instance.hierarchyheader.Editor.csproj
+/ElementAnimationToolkit.sln
+/id.instance.elementanimationtoolkit.csproj
+/id.instance.elementanimationtoolkit.Editor.csproj
+/packages.config
+/Packages/AngleSharp.1.0.0-alpha-844/
+/Packages/System.Runtime.CompilerServices.Unsafe.4.5.0/
+/Packages/System.Text.Encoding.CodePages.4.5.0/

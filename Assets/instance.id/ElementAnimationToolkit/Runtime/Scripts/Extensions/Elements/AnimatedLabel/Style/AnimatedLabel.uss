@@ -1,0 +1,37 @@
+﻿/* --------------------------------------------------------
+   AnimatedLabel                                        --
+   ----------------------------------------------------- */
+
+/* --------------------------------- */
+/* Container ----------------------- */
+/*<editor-fold desc="Container">*/
+
+.animated-label-container {
+    flex-direction: row;
+}
+
+.animatedLabel {
+    padding: 0;
+}
+
+
+/*</editor-fold> Container*/
+
+/* -------------------------------- */
+/* Unity default Overrides -------- */
+/*<editor-fold desc="UnityDefaults">*/
+
+.unity-scroll-view {
+    flex: 1 0 0;
+}
+
+.unity-box {
+    flex: 1 0 0;
+    margin: 0;
+}
+
+.unity-popup-window {
+    padding: 5px 10px 12px;
+}
+
+/*</editor-fold>*/

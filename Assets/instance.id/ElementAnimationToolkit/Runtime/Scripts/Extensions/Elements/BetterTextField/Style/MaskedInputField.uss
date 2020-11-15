@@ -1,0 +1,74 @@
+﻿/* BetterTextField Styles */
+
+* {
+    --standard-margin: 8px;
+    --half-standard-margin: 4px;
+    --quarter-standard-margin: 2px;
+    --standard-padding: var(--standard-margin);
+
+    --icon-size: 16px;
+    --half-icon-size: 8px;
+    --large-icon-size: 22px;
+    --half-large-icon-size: 11px;
+    --icon-standard-margin: var(--half-standard-margin);
+
+    --list-entry-height: 25px;
+    --list-entry-path-font-size: 10px;
+    --dark-list-entry-path-text-color: #949494;
+    --light-list-entry-path-text-color: #6B6B6B;
+
+    --profile-icon-font-size: 13px;
+
+    --no-color: rgba(0, 0, 0, 0);
+    --dark-placeholder-text-color: #7D7D7D;
+    --light-placeholder-text-color: #7D7D7D;
+
+    /* Colours used for custom buttons that don't have a border */
+    --dark-button-hover-focus-bg-color: #303030;
+    --light-button-hover-focus-bg-color: #B2B2B2;
+    --dark-button-active-bg-color: #484848;
+    --light-button-active-bg-color: #8F8F8F;
+
+    --divider-dark: #5F5F5F;
+    --divider-light: #9A9A9A;
+
+    --fixed-size: 0 0 auto;
+}
+
+.textInputBase{
+    background-color: initial;
+    border-width: 2px;
+    border-color: initial;
+    border-radius: 4px;
+}
+
+.maskedText{
+    flex: auto;
+    background-color: initial;
+    border-width: 2px;
+    border-color: initial;
+    border-radius: 4px;
+}
+.maskedInput{
+    background-color: initial;
+    padding-bottom: 2px;
+    border-width: 2px;
+    border-color: initial;
+    border-radius: 4px;
+}
+
+.unity-masked-text-field__placeholder {
+    align-self: center;
+    position: absolute;
+    margin: 0;
+    padding-left: 5px;
+    color: var(--dark-placeholder-text-color);
+}
+
+.hidden {
+    display: none;
+}
+
+.unity-masked-text-field #unity-text-input {
+    overflow: hidden;
+}

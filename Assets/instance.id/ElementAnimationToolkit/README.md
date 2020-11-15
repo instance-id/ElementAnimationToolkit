@@ -2,12 +2,12 @@
 # ElementAnimationToolkit
 
 ### A collection of Unity UIElements animation extension methods, new animated elements, and examples.
-![](media/intro_animation.gif)
+![](Documentation/media/intro_animation.gif)
 
-### Note: UIElements Animations are listed as Experimental by Unity - API subject to change. Also, since Element Animation Toolkit is currently underactive development, it is possible for API changes in this library as well 
+### Note: UIElements Animations are listed as Experimental by Unity - API subject to change. Also, since Element Animation Toolkit is currently underactive development, it is possible for API changes in this library as well
 
-#### The intent of this package is to help asset developers more easily create their own animation sequences via code.  
-Though, I have been adding some new "ready to go" UIElement types, such as the "AnimatedFoldout", which you just use as you would a a typical foldout comes animated with no additional coding, minus some exposed properties to adjust the animation to your liking. I do intend to add more of these as I go along. 
+#### The intent of this package is to help asset developers more easily create their own animation sequences via code.
+Though, I have been adding some new "ready to go" UIElement types, such as the "AnimatedFoldout", which you just use as you would a a typical foldout comes animated with no additional coding, minus some exposed properties to adjust the animation to your liking. I do intend to add more of these as I go along.
 
 This package began simply as a small collection of helpers methods I created across my last few projects to make animating editor elements much easier and finally put into a single place. I continue to add to it as I go along but decided to put together several examples and wanted to share them.
 
@@ -40,8 +40,8 @@ Note: The code is pretty ~~heavily~~ excessively documented and currently most m
 There are several fairly basic base animation helper methods which can easily be used on their own, but are also the basis of the more complex animation sequences:
 
 ### Background Color Fade-In
-![](media/background_fade_example.gif)  
- (The initial fade from gray to blue)
+![](Documentation/media/background_fade_example.gif)  
+(The initial fade from gray to blue)
 
 <details open>
 <summary>Example animation base helper: AnimateBackgroundColor()</summary>
@@ -63,7 +63,7 @@ visualElement.AnimateBackgroundColor(originalColor, fadeColor, durationOfFade);
 ---
 
 ### Hover Border Pulse
-![](media/hoverborderpulse_example.gif)  
+![](Documentation/media/hoverborderpulse_example.gif)
 <details open>
 <summary>Example hover animation: HoverBorderPulse()</summary>
 
@@ -79,11 +79,11 @@ visualElement.HoverBorderPulse(pulseStartColor: GetColor.FromHex("#7F3B3A"), pul
 ---
 
 ### Fade-in sequence
-![](media/fade_example.gif)
+![](Documentation/media/fade_example.gif)
 
 <details open>
 <summary>Example complex animation sequence: AnimFadeInSequence()</summary>
- 
+
 Usage:
 
 ```c#
@@ -101,7 +101,7 @@ label.AnimFadeInSequence(newText, animatedTextColor, originalTextColor, fadeInTi
 
 </details>
 
-Then, of course, there is everything in between. 
+Then, of course, there is everything in between.
 
 Additionally there are many helper methods relating to many different Types from Color to opening weblinks in the browser.
 
@@ -158,25 +158,25 @@ public static T OpenURL<T>(this T element, string url) where T : VisualElement
 Important files:
 
     Assets/instance.id/ElementAnimationToolkit/Editor/EATKEditor.cs
-This file is the primary example and demonstrative reference for most major features and is the main editor window of the package 
+This file is the primary example and demonstrative reference for most major features and is the main editor window of the package
 where you can view examples of several different types of animations and their usage.
 
 You can access the main editor window via Tools > instance.id > Element Animation Toolkit
 
 There are three buttons per row, Editor, Anim, and USS.
 
-![](media/rowbuttons.png)
+![](Documentation/media/rowbuttons.png)
 
 The editor button will take you directly to the editor code specific to that element where you will see the C# implementation of UIElements as well as most callback registrations.
 
-The Anim button takes you to another section of the file in which you can see the declaration, setup, and execution of any animation specific functions, 
+The Anim button takes you to another section of the file in which you can see the declaration, setup, and execution of any animation specific functions,
 
 Lastly is the USS button, which takes you to the USS stylesheet and the location of the particular animation if you need.
 
-The animations without a row of buttons have a right-click context menu implemented which has similar options to jump directly into 
-the code at the proper location for the animation. (The methods I have created for jumping straight to the proper lines of code 
+The animations without a row of buttons have a right-click context menu implemented which has similar options to jump directly into
+the code at the proper location for the animation. (The methods I have created for jumping straight to the proper lines of code
 are of course included and you are welcome to take advantage of them for your own needs.)  
-![](media/jumptomenu.png)
+![](Documentation/media/jumptomenu.png)
 
 
 ---
