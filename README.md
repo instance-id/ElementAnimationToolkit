@@ -15,11 +15,12 @@ This package began simply as a small collection of helpers methods I created acr
 
 Examples: Tools > instance.id > Element Animation Toolkit
 
-Note: The code is pretty ~~heavily~~ excessively documented and currently most method summaries for extension methods have examples in them. Be sure to check the comments for additional details!
+Note: The code is pretty ~~heavily~~ excessively documented and currently most method summaries for extension methods have examples in them. Be sure to check the comments for additional details!  
+
 ![](https://i.imgur.com/hY3DGDA.png)
 
 
-<details open>
+<details>
 <summary>Example: Method IDE summary for 'HoverColor()'</summary>
 
 ```cs
@@ -43,7 +44,7 @@ There are several fairly basic base animation helper methods which can easily be
 ![](media/background_fade_example.gif)  
  (The initial fade from gray to blue)
 
-<details open>
+<details>
 <summary>Example animation base helper: AnimateBackgroundColor()</summary>
 Usage:
 
@@ -64,7 +65,7 @@ visualElement.AnimateBackgroundColor(originalColor, fadeColor, durationOfFade);
 
 ### Hover Border Pulse
 ![](media/hoverborderpulse_example.gif)  
-<details open>
+<details>
 <summary>Example hover animation: HoverBorderPulse()</summary>
 
 Usage:
@@ -81,7 +82,7 @@ visualElement.HoverBorderPulse(pulseStartColor: GetColor.FromHex("#7F3B3A"), pul
 ### Fade-in sequence
 ![](media/fade_example.gif)
 
-<details open>
+<details>
 <summary>Example complex animation sequence: AnimFadeInSequence()</summary>
  
 Usage:
@@ -105,7 +106,7 @@ Then, of course, there is everything in between.
 
 Additionally there are many helper methods relating to many different Types from Color to opening weblinks in the browser.
 
-<details open>
+<details>
 <summary>Example color helper method: GetColor.FromHex()</summary>
 
 Usage:
@@ -126,7 +127,7 @@ public static Color FromHex(this string color)
 
 </details>
 
-<details open>
+<details>
 <summary>Example creating an external url link : OpenURL() </summary>
 
 Usage:
