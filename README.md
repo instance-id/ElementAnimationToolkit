@@ -4,7 +4,7 @@
 ### A collection of Unity UIElements animation extension methods, new animated elements, and examples.
 ![](media/intro_animation.gif)
 
-## [Documentation]("https://docs.instance.id/elementanimationtoolkit/")
+[Documentation] https://docs.instance.id/elementanimationtoolkit/
 
 ### Note: UIElements Animations are listed as Experimental by Unity - API subject to change. Also, since Element Animation Toolkit is currently underactive development, it is possible for API changes in this library as well 
 
