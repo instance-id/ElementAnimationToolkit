@@ -243,7 +243,7 @@ namespace instance.id.EATK
             // -- Set the initial opacity to 0 so that it can fade in when opened --
             new AnimatedLabel {text = "Documentation", style = {opacity = 0.Zero()}}
                 .Create(out var docsLabel).ToUSS(nameof(docsLabel)).SetParent(menuInfoContainer)
-                .OpenURL("https://help.instance.id/");
+                .OpenURL("https://docs.instance.id/elementanimationtoolkit/");
 
             // ----------------------------------------------------- @MenuInfoToggle
             // -- The below Toggle lets us utilize it's "ValueChanged" callback,  --
@@ -281,13 +281,13 @@ namespace instance.id.EATK
                 colorDuration: 500);
         }
 
-        // ------------------------------------------- @BuildInfoContainer
+        // ------------------------------------------ @InstanceIdContainer
         // ---------------------------------------------------------------
-        private VisualElement BuildInfoContainer()
+        private VisualElement BuildInstanceIdContainer()
         {
-            var infoContainer = new VisualElement();
-            infoContainer.NameAsUSS(nameof(infoContainer));
-            infoContainer.AddToClassList("rightEdgePadding");
+            var instanceIdContainer = new VisualElement();
+            instanceIdContainer.NameAsUSS(nameof(instanceIdContainer));
+            instanceIdContainer.AddToClassList("rightEdgePadding");
 
             instanceidLabel = new AnimatedLabel {text = "instance.id"};
             instanceidLabel.NameAsUSS(nameof(instanceidLabel));
@@ -295,13 +295,13 @@ namespace instance.id.EATK
                 jumpTargets: new List<JumpTarget>
                 {
                     new JumpTarget {Locator = "_IntroAnimateIdLabel", MenuTitle = "Jump to Animation", JumpType = JumpType.Animation},
-                    new JumpTarget {Locator = "_BuildInfoContainer", MenuTitle = "Jump to Element", JumpType = JumpType.Element},
+                    new JumpTarget {Locator = "_InstanceIdContainer", MenuTitle = "Jump to Element", JumpType = JumpType.Element},
                     new JumpTarget {Locator = "_InstanceIdLabel", MenuTitle = "Jump to USS", JumpType = JumpType.USS},
                 },
                 additionalMenus: new Dictionary<string, Action> {{"Replay Animation", AnimateIdLabel}});
 
-            infoContainer.Add(instanceidLabel);
-            return infoContainer;
+            instanceIdContainer.Add(instanceidLabel);
+            return instanceIdContainer;
         }
 
         #endregion
@@ -382,7 +382,7 @@ namespace instance.id.EATK
             imageAnimationLabelColumn.Add(new VisualElement[] {imageAnimationAnimatedFoldout, imageAnimationLabel});
 
             // -- Image Animation Info Column --------
-            nestedInfoColumn.Add(new[] {BuildInfoContainer(), imageAnimationButtonContainer});
+            nestedInfoColumn.Add(new[] {BuildInstanceIdContainer(), imageAnimationButtonContainer});
 
             // -- Add elements to Row Container ------
             var items = new[] {imageAnimationButton, imageAnimationLabelColumn, imageAnimationSpacer, nestedInfoColumn};
