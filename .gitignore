@@ -108,3 +108,5 @@ crashlytics-build.properties
 /Packages/System.Text.Encoding.CodePages.4.5.0/
 
 .bak/
+
+.unitybackup
