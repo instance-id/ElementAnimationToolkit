@@ -1,9 +1,10 @@
 ﻿// ----------------------------------------------------------------------------
-// -- Project : https://github.com/instance-id/ElementAnimationToolkit         --
+// -- Project : https://github.com/instance-id/ElementAnimationToolkit       --
 // -- instance.id 2020 | http://github.com/instance-id | http://instance.id  --
 // ----------------------------------------------------------------------------
 
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UIElements;
 using UnityEngine.UIElements.Experimental;
@@ -88,7 +89,7 @@ namespace instance.id.EATK.Extensions
                 target.UnregisterCallback<MouseOutEvent>(evt =>
                 {
                     var tar = (VisualElement) evt.target;
-                    
+
                     if (condition != null && condition(conditionElement)) return;
                     if (mouseOver.isRunning) mouseOver.Stop();
 
@@ -302,7 +303,7 @@ namespace instance.id.EATK.Extensions
         // -------------------------------------------------------- @HoverWidth
         // -- Animate the width of target element to desired value on hover  --
         // --------------------------------------------------------------------
-        public static void HoverWidth(this VisualElement target, float initialWidth = 0f, float desiredWidth = 100f, int duration = 1000, Action hoverCallback = null,
+        public static AnimatedItems HoverWidth(this VisualElement target, float initialWidth = 0f, float desiredWidth = 100f, int duration = 1000, Action hoverCallback = null,
             Action leaveCallback = null,
             bool afterAnimation = false)
         {
@@ -310,13 +311,19 @@ namespace instance.id.EATK.Extensions
             var enterAnim = new ValueAnimation<StyleValues>();
             var leaveAnim = new ValueAnimation<StyleValues>();
 
+            enterAnim = afterAnimation
+                ? target.AnimateWidth(initialWidth, desiredWidth, duration, callback: hoverCallback)
+                : target.AnimateWidth(initialWidth, desiredWidth, duration);
+            enterAnim.KeepAlive();
+
+            leaveAnim = target.AnimateWidth(desiredWidth, initialWidth, duration, easing: Easy.EaseInOutQuint);
+            leaveAnim.KeepAlive();
+
             void MouseEnter()
             {
-                enterAnim = afterAnimation
-                    ? target.AnimateWidth(initialWidth, desiredWidth, duration, callback: hoverCallback)
-                    : target.AnimateWidth(initialWidth, desiredWidth, duration);
+                enterAnim.Start();
             } // @formatter:off
-            void MouseLeave() { leaveAnim = target.AnimateWidth(desiredWidth, initialWidth, duration, easing: Easy.EaseInOutQuint); } // @formatter:on
+            void MouseLeave() { leaveAnim.Start(); } // @formatter:on
 
             target.RegisterCallback<MouseOverEvent>(evt =>
             {
@@ -336,6 +343,8 @@ namespace instance.id.EATK.Extensions
                 evt.StopPropagation();
                 target.schedule.Execute(leaveCallback).StartingIn(duration);
             });
+
+            return new AnimatedItems(target) {AnimatedItemList = new List<ValueAnimation<StyleValues>> {enterAnim, leaveAnim}};
         }
 
         // ------------------------------------------------------- @HoverHeight

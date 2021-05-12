@@ -1,9 +1,10 @@
 ﻿// ----------------------------------------------------------------------------
-// -- Project : https://github.com/instance-id/UIElementsAnimation           --
+// -- Project : https://github.com/instance-id/ElementAnimationToolkit       --
 // -- instance.id 2020 | http://github.com/instance-id | http://instance.id  --
 // ----------------------------------------------------------------------------
 
 using System;
+using instance.id.Extensions;
 using UnityEngine;
 using UnityEngine.UIElements;
 using UnityEngine.UIElements.Experimental;

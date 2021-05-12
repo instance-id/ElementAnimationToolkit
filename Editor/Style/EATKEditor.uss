@@ -1,7 +1,7 @@
 ﻿/* ----------------------------------------------------------------------------
-// -- Project : https://github.com/instance-id/UIElementsAnimation           --
+// -- Project : https://github.com/instance-id/ElementAnimationToolkit       --
 // -- instance.id 2020 | http://github.com/instance-id | http://instance.id  --
-// --- UIElementsAnimationEditor.uss --------------------------------------- */
+// --- ElementAnimationToolkitEditor.uss --------------------------------------- */
 
 /* --------------------------------- */
 /* Editor Main Window -------------- */
@@ -41,7 +41,7 @@
 
 .menuInfoContainer {
     display: none;
-    width: 1;
+    width: 1px;
     flex-direction: row;
     background-color: #303030;
     align-self: center;

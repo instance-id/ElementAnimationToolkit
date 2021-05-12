@@ -1,5 +1,5 @@
 ﻿// ----------------------------------------------------------------------------
-// -- Project : https://github.com/instance-id/ElementAnimationToolkit          --
+// -- Project : https://github.com/instance-id/ElementAnimationToolkit       --
 // -- instance.id 2020 | http://github.com/instance-id | http://instance.id  --
 // ----------------------------------------------------------------------------
 
@@ -74,7 +74,7 @@ namespace instance.id.EATK
         /// <param name="value">Expands on true, collapses on false</param>
         public void Activate(bool value)
         {
-            IsAnimating = true;
+            // IsAnimating = true;
             expandToggle.value = value;
         }
 
@@ -117,7 +117,6 @@ namespace instance.id.EATK
 
         private void ExpandContainerValueChanges(ChangeEvent<bool> evt)
         {
-            IsAnimating = true;
             if (style.display == DisplayStyle.None) style.display = DisplayStyle.Flex;
             if (expandContainerItems.style.display == DisplayStyle.None) expandContainerItems.style.display = DisplayStyle.Flex;
 
@@ -140,6 +139,7 @@ namespace instance.id.EATK
                     expandContainerItems.style.display = DisplayStyle.None;
                 }
 
+                IsAnimating = true;
                 foldoutAnimation =
                     expandContainerItems.experimental.animation.Start(new StyleValues
                         {
@@ -153,7 +153,6 @@ namespace instance.id.EATK
 
         private void ExpandContainerValueChanges(bool evt)
         {
-            IsAnimating = true;
             if (style.display == DisplayStyle.None) style.display = DisplayStyle.Flex;
             if (expandContainerItems.style.display == DisplayStyle.None) expandContainerItems.style.display = DisplayStyle.Flex;
 
@@ -170,6 +169,7 @@ namespace instance.id.EATK
             }
             else
             {
+                IsAnimating = true;
                 foldoutAnimation =
                     expandContainerItems.experimental.animation
                         .Start(new StyleValues {height = expandContainerItems.layout.height}, new StyleValues {height = 0}, firstStart ? tmpAnimTime : m_AnimationTime)
@@ -182,7 +182,6 @@ namespace instance.id.EATK
         private void OnGeometryChangedEvent(GeometryChangedEvent evt)
         {
             IsAnimating = true;
-
             foldoutAnimation =
                 expandContainerItems.experimental.animation
                     .Start(new StyleValues {height = evt.oldRect.height}, new StyleValues {height = evt.newRect.height}, firstStart ? tmpAnimTime : m_AnimationTime)

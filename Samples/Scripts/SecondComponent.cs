@@ -14,7 +14,7 @@ namespace instance.id.EATK.Examples
 {
     [ExecuteInEditMode]
     [Serializable]
-    public class ExampleComponent : MonoBehaviour
+    public class SecondComponent : MonoBehaviour
     {
         public Action<string> highlight;
         public List<VisualElement> inspectorElements = new List<VisualElement>();

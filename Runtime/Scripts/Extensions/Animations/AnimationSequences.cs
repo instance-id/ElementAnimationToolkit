@@ -8,6 +8,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using instance.id.Extensions;
 using UnityEngine;
 using UnityEngine.UIElements;
 using UnityEngine.UIElements.Experimental;
@@ -26,20 +27,19 @@ namespace instance.id.EATK.Extensions
         /// Animate the height of target element to desired value
         /// </summary>
         /// <param name="target">VisualElement to animate</param>
-        /// <param name="startColor">Initial height of element</param>
-        /// <param name="endColor">Desired ending height after animation</param>
+        /// <param name="color1">Initial height of element</param>
+        /// <param name="color2">Desired ending height after animation</param>
         /// <param name="cascadeMs">The length of time in which each subsequent animation in the sequence will be offset (in milliseconds)</param>
         /// <param name="durationMS">The amount of time in which the animation will complete from start to finish (in milliseconds)</param>
         /// <param name="reverse">Animation will play in reverse, from right to left</param>
         /// <param name="callback">Function that can be called when the animation is completed</param>
-        public static List<ValueAnimation<StyleValues>> AnimCharacterSequence(this VisualElement target, Color startColor, Color endColor, int cascadeMs, int durationMS,
+        /// <param name="flexBasis">Set a custom flex basis</param>
+        public static List<ValueAnimation<StyleValues>> AnimCharacterSequence(this VisualElement target, Color color1, Color color2, int cascadeMs, int durationMS,
             bool reverse = false,
             Action callback = null,
             float flexBasis = default)
         {
             var animatedValues = new List<ValueAnimation<StyleValues>>();
-            IEnumerable<string> originalStyle = new List<string>();
-            IEnumerable<string> resolvedStyle = new List<string>();
             VisualElementStyleStore styleData = new VisualElementStyleStore();
             var textString = "";
 
@@ -101,11 +101,11 @@ namespace instance.id.EATK.Extensions
                 {
                     if (current == count)
                         l.schedule.Execute(() => animatedValues.Add(
-                            l.AnimateColor(startColor, endColor, durationMS, AnimationPhase2))).StartingIn(cascade);
+                            l.AnimateColor(color1, color2, durationMS, AnimationPhase2))).StartingIn(cascade);
 
                     else
                         l.schedule.Execute(() => animatedValues.Add(
-                            l.AnimateColor(startColor, endColor, durationMS))).StartingIn(cascade);
+                            l.AnimateColor(color1, color2, durationMS))).StartingIn(cascade);
 
                     cascade += cascadeMs;
                     current++;
@@ -123,11 +123,11 @@ namespace instance.id.EATK.Extensions
                 {
                     if (current == count)
                         l.schedule.Execute(() => animatedValues.Add(
-                            l.AnimateColor(endColor, startColor, durationMS, AnimationComplete))).StartingIn(cascade);
+                            l.AnimateColor(color2, color1, durationMS, AnimationComplete))).StartingIn(cascade);
 
                     else
                         l.schedule.Execute(() => animatedValues.Add(
-                            l.AnimateColor(endColor, startColor, durationMS))).StartingIn(cascade);
+                            l.AnimateColor(color2, color1, durationMS))).StartingIn(cascade);
 
                     cascade += cascadeMs;
                     current++;
@@ -163,22 +163,25 @@ namespace instance.id.EATK.Extensions
 
         public static void AnimFadeInSequence(this Label element, string newText = default, Color textColor = default, Color textDefaultColor = default, float fadeIn = 0f,
             float display = 0f,
-            float fadeOut = 0f)
+            float fadeOut = 0f,
+            Func<float, float> easing = null)
         {
-            DoFadeInSequence(element, newText, textColor, textDefaultColor, fadeIn, display, fadeOut, element.text);
+            DoFadeInSequence(element, newText, textColor, textDefaultColor, fadeIn, display, fadeOut, element.text, easing);
         }
 
         public static void AnimFadeInSequence(this VisualElement element, Color textColor = default, Color textDefaultColor = default, float fadeIn = 0f,
             float display = 0f,
-            float fadeOut = 0f)
+            float fadeOut = 0f,
+            Func<float, float> easing = null)
         {
-            DoFadeInSequence(element, default, textColor, textDefaultColor, fadeIn, display, fadeOut);
+            DoFadeInSequence(element, default, textColor, textDefaultColor, fadeIn, display, fadeOut, easing: easing);
         }
 
         private static void DoFadeInSequence(this VisualElement element, string newText = default, Color textColor = default, Color textDefaultColor = default, float fadeIn = 0f,
             float display = 0f,
             float fadeOut = 0f,
-            string originalText = default)
+            string originalText = default,
+            Func<float, float> easing = null)
         {
             var animFadeIn = new ValueAnimation<StyleValues>();
             var animWaiter = new ValueAnimation<StyleValues>();
@@ -206,19 +209,19 @@ namespace instance.id.EATK.Extensions
             {
                 if (textColor != default) element.style.color = textColor;
                 if (element is Label label) label.text = newText;
-                DoFadeIn(element, fadeInTime, Display);
+                DoFadeIn(element, fadeInTime, Display, easing);
             }
 
             // -- Display : Callback 2 --------------------
             void Display()
             {
-                DoDisplayMessage(element, displayTime, FadeOut);
+                DoDisplayMessage(element, displayTime, FadeOut, easing);
             }
 
             // -- FadeOut : Callback 3 --------------------
             void FadeOut()
             {
-                animFadeOut = originalText != default ? DoFadeOut(element, fadeOutTime, ClearText) : DoFadeOut(element, fadeOutTime);
+                animFadeOut = originalText != default ? DoFadeOut(element, fadeOutTime, ClearText, easing) : DoFadeOut(element, fadeOutTime, easing: easing);
             }
 
             // -- ClearText : Callback 4 is triggered if a the animated element is ------
@@ -233,31 +236,34 @@ namespace instance.id.EATK.Extensions
 
         // ------------------------------------------------------ DoFadeIn
         // -- DoFadeIn ---------------------------------------------------
-        private static ValueAnimation<StyleValues> DoFadeIn(VisualElement elementToFadeIn, float durationMs, Action callback = null)
+        private static ValueAnimation<StyleValues> DoFadeIn(VisualElement elementToFadeIn, float durationMs, Action callback = null, Func<float, float> easing = null)
         {
+            if (easing == null) easing = Easy.OutQuad;
             return elementToFadeIn.experimental.animation
                 .Start(new StyleValues {opacity = 0.Zero()}, new StyleValues {opacity = 1}, (int) durationMs)
-                .Ease(Easy.OutQuad)
+                .Ease(easing)
                 .OnCompleted(callback);
         }
 
         // ---------------------------------------------- DoDisplayMessage
         // -- DoDisplayMessage -------------------------------------------
-        private static ValueAnimation<StyleValues> DoDisplayMessage(VisualElement elementToDisplay, float durationMs, Action callback = null)
+        private static ValueAnimation<StyleValues> DoDisplayMessage(VisualElement elementToDisplay, float durationMs, Action callback = null, Func<float, float> easing = null)
         {
+            if (easing == null) easing = Easy.OutQuad;
             return elementToDisplay.experimental.animation
                 .Start(new StyleValues {opacity = 1}, new StyleValues {opacity = 1}, (int) durationMs)
-                .Ease(Easy.OutQuad)
+                .Ease(easing)
                 .OnCompleted(callback);
         }
 
         // ----------------------------------------------------- DoFadeOut
         // -- DoFadeOut --------------------------------------------------
-        private static ValueAnimation<StyleValues> DoFadeOut(VisualElement elementToFadeOut, float durationMs, Action callback = null)
+        private static ValueAnimation<StyleValues> DoFadeOut(VisualElement elementToFadeOut, float durationMs, Action callback = null, Func<float, float> easing = null)
         {
+            if (easing == null) easing = Easy.OutQuad;
             return elementToFadeOut.experimental.animation
                 .Start(new StyleValues {opacity = 1}, new StyleValues {opacity = 0.Zero()}, (int) durationMs)
-                .Ease(Easy.OutQuad)
+                .Ease(easing)
                 .OnCompleted(callback);
         }
 

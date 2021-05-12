@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using instance.id.Extensions;
 using JetBrains.Annotations;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -41,7 +42,7 @@ namespace instance.id.EATK.Extensions
         public MaskedInputField()
         {
             if (monoFont == null)
-                monoFont = VisualElementUtils.GetFont("SourceCodePro-Medium");
+                monoFont = AssetFileExtensions.GetFont("SourceCodePro-Medium");
             if (monoFont == null) Debug.Log($"Font not found");
 
             AddToClassList(UssClassName);
