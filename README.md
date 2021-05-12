@@ -13,11 +13,11 @@ Though, I have been adding some new "ready to go" UIElement types, such as the "
 
 This package began simply as a small collection of helpers methods I created across my last few projects to make animating editor elements much easier and finally put into a single place. I continue to add to it as I go along but decided to put together several examples and wanted to share them.
 
-### Install via OpenUPM
-openupm add id.instance.elementanimationtoolkit
+### [Install via OpenUPM](https://openupm.com/packages/id.instance.elementanimationtoolkit)
+```openupm add id.instance.elementanimationtoolkit```
 
-### Unity Package Manager
-https://github.com/instance-id/elementanimationtoolkit.git#upm
+### [Unity Package Manager](https://github.com/instance-id/ElementAnimationToolkit/tree/upm)
+```github.com/instance-id/elementanimationtoolkit.git#upm```
 
 ### Usage:
 
