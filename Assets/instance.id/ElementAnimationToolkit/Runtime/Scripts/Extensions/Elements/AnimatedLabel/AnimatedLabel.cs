@@ -1,11 +1,12 @@
 ﻿// ----------------------------------------------------------------------------
-// -- Project : https://github.com/instance-id/ElementAnimationToolkit          --
+// -- Project : https://github.com/instance-id/ElementAnimationToolkit       --
 // -- instance.id 2020 | http://github.com/instance-id | http://instance.id  --
 // ----------------------------------------------------------------------------
 
 using System;
 using System.Collections.Generic;
 using instance.id.EATK.Extensions;
+using instance.id.Extensions;
 using UnityEngine;
 using UnityEngine.UIElements;
 // ReSharper disable UnusedMember.Global

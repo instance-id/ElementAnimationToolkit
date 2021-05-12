@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using instance.id.EATK.Extensions;
+using instance.id.Extensions;
 using JetBrains.Annotations;
 using UnityEditor;
 using UnityEditor.UIElements;
@@ -94,7 +95,7 @@ namespace instance.id.EATK
             ussType = typeof(StyleSheet);
 
             if (monoFont == null)
-                monoFont = VisualElementUtils.GetFont("SourceCodePro-Medium");
+                monoFont = AssetFileExtensions.GetFont("SourceCodePro-Medium");
 
             StylesheetSetup();
             animatedIcon = (Texture2D) EditorGUIUtility.IconContent("ScriptableObject Icon").image;
@@ -376,17 +377,17 @@ namespace instance.id.EATK
                 .ToUSS(nameof(imageAnimationUSSButton));
 
             // -- Add Buttons to Button Container ----
-            imageAnimationButtonContainer.Add(new VisualElement[] {imageAnimationEditorButton, imageAnimationAnimButton, imageAnimationUSSButton});
+            imageAnimationButtonContainer.AddAll(new VisualElement[] {imageAnimationEditorButton, imageAnimationAnimButton, imageAnimationUSSButton});
             buttonContainerDictionary.Add(imageAnimationButtonContainer.name, imageAnimationButtonContainer);
 
-            imageAnimationLabelColumn.Add(new VisualElement[] {imageAnimationAnimatedFoldout, imageAnimationLabel});
+            imageAnimationLabelColumn.AddAll(new VisualElement[] {imageAnimationAnimatedFoldout, imageAnimationLabel});
 
             // -- Image Animation Info Column --------
-            nestedInfoColumn.Add(new[] {BuildInstanceIdContainer(), imageAnimationButtonContainer});
+            nestedInfoColumn.AddAll(new[] {BuildInstanceIdContainer(), imageAnimationButtonContainer});
 
             // -- Add elements to Row Container ------
             var items = new[] {imageAnimationButton, imageAnimationLabelColumn, imageAnimationSpacer, nestedInfoColumn};
-            imageAnimationContainer.Add(items);
+            imageAnimationContainer.AddAll(items);
             elementScroller.Add(imageAnimationContainer);
         }
 
@@ -433,12 +434,12 @@ namespace instance.id.EATK
 
             // -- Add Buttons to Button Container ----
             fadeTextAnimationButtonContainer
-                .Add(new VisualElement[] {fadeTextAnimationEditorButton, fadeTextAnimationAnimButton, fadeTextAnimationUSSButton});
+                .AddAll(new VisualElement[] {fadeTextAnimationEditorButton, fadeTextAnimationAnimButton, fadeTextAnimationUSSButton});
             buttonContainerDictionary.Add(fadeTextAnimationButtonContainer.name, fadeTextAnimationButtonContainer);
 
             // -- Add elements to Row Container ------
             var ftaItems = new[] {fadeTextAnimButton, fadeTextAnimationLabel, fadeTextAnimationSpacer, fadeTextAnimationButtonContainer};
-            fadeTextAnimationContainer.Add(ftaItems).SetParent(elementScroller);
+            fadeTextAnimationContainer.AddAll(ftaItems).SetParent(elementScroller);
         }
 
         #endregion
@@ -771,8 +772,8 @@ namespace instance.id.EATK
             foldoutLabel1.schedule.Execute(() =>
             {
                 foldoutLabel1.AnimCharacterSequence(
-                    startColor: originalColor,
-                    endColor: animatedColor,
+                    color1: originalColor,
+                    color2: animatedColor,
                     cascadeMs: cascadeMs,
                     durationMS: durationMs);
             }).StartingIn(label1Delay);
@@ -780,8 +781,8 @@ namespace instance.id.EATK
             foldoutLabel2.schedule.Execute(() =>
             {
                 foldoutLabel2.AnimCharacterSequence(
-                    startColor: originalColor,
-                    endColor: animatedColor,
+                    color1: originalColor,
+                    color2: animatedColor,
                     cascadeMs: cascadeMs,
                     durationMS: durationMs);
             }).StartingIn(label2Delay);
@@ -800,8 +801,8 @@ namespace instance.id.EATK
             var durationMs = 400;
 
             instanceidLabel.AnimCharacterSequence(
-                startColor: originalColor,
-                endColor: GetColor.FromHex("#2F569C"),
+                color1: originalColor,
+                color2: GetColor.FromHex("#2F569C"),
                 cascadeMs: cascadeMs,
                 durationMS: durationMs);
         }
@@ -968,8 +969,7 @@ namespace instance.id.EATK
                 // -- Fade In Background Container Color ----------------------
                 menuInfoContainer.schedule.Execute(() =>
                 {
-                    var menupg = menuInfoContainer.AnimateBackgroundColor(
-                        startColor: originalInfoBgColor,
+                    var menupg = VisualElementBaseAnimation.AnimateBackgroundColor(menuInfoContainer, startColor: originalInfoBgColor,
                         endColor: GetColor.FromHex("#212121"),
                         durationMs: 600);
                     menupg.Start();
@@ -987,8 +987,8 @@ namespace instance.id.EATK
                 menuInfoContainer.schedule.Execute(() =>
                 {
                     discordLabel.AnimCharacterSequence(
-                        startColor: originalColor,
-                        endColor: hoverLabelColor,
+                        color1: originalColor,
+                        color2: hoverLabelColor,
                         cascadeMs: 50,
                         durationMS: 100,
                         reverse: true);
@@ -997,8 +997,8 @@ namespace instance.id.EATK
                 menuInfoContainer.schedule.Execute(() =>
                 {
                     docsLabel.AnimCharacterSequence(
-                        startColor: originalColor,
-                        endColor: hoverLabelColor,
+                        color1: originalColor,
+                        color2: hoverLabelColor,
                         cascadeMs: 50,
                         durationMS: 100,
                         reverse: true);
@@ -1034,8 +1034,7 @@ namespace instance.id.EATK
 
                 menuInfoContainer.schedule.Execute(() =>
                 {
-                    menuInfoContainer.AnimateBackgroundColor(
-                        GetColor.FromHex("#212121"),
+                    VisualElementBaseAnimation.AnimateBackgroundColor(menuInfoContainer, GetColor.FromHex("#212121"),
                         originalInfoBgColor,
                         400);
                 }).StartingIn(0);
@@ -1101,7 +1100,8 @@ namespace instance.id.EATK
                 originalTextColor,
                 fadeInTime,
                 displayTime,
-                fadeOutTime);
+                fadeOutTime,
+                easing);
         }
 
         // --------------------------------------- @AnimFadeColorAnimation
@@ -1217,8 +1217,7 @@ namespace instance.id.EATK
             buttonContainer.style.paddingTop = 1;
 
             // -- Begin animation -------------------------
-            heightAnimateFrom = heightChangeAnimationLabel.AnimateHeight(
-                currentHeight,
+            heightAnimateFrom = VisualElementBaseAnimation.AnimateHeight(heightChangeAnimationLabel, currentHeight,
                 desiredHeight,
                 durationInMs,
                 ReturnHeightToOriginal);

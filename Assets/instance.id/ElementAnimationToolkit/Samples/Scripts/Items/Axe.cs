@@ -1,5 +1,5 @@
 ﻿// ----------------------------------------------------------------------------
-// -- Project : https://github.com/instance-id/AboveAverageInspector         --
+// -- Project : https://github.com/instance-id/ElementAnimationToolkit       --
 // -- instance.id 2020 | http://github.com/instance-id | http://instance.id  --
 // ----------------------------------------------------------------------------
 

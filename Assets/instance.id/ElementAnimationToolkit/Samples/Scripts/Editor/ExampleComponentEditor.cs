@@ -1,6 +1,9 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using instance.id.EATK.Editors;
 using instance.id.EATK.Extensions;
+using instance.id.Extensions;
 using JetBrains.Annotations;
 using UnityEditor;
 using UnityEditor.UIElements;
@@ -10,7 +13,7 @@ using UnityEngine.UIElements;
 namespace instance.id.EATK.Examples
 {
     [CustomEditor(typeof(ExampleComponent))]
-    public class ExampleComponentEditor : Editor
+    public class ExampleComponentEditor : DefaultUIElementsEditor
     {
         private VisualElement root;
         private ExampleComponent exampleComponent;
@@ -26,6 +29,9 @@ namespace instance.id.EATK.Examples
         private void OnEnable()
         {
             exampleComponent = target as ExampleComponent;
+            if (!(exampleComponent is null))
+                exampleComponent.highlight += HighLightComponent;
+
             editorType = GetType();
             StylesheetSetup();
         }
@@ -42,8 +48,9 @@ namespace instance.id.EATK.Examples
 
             root = new VisualElement();
             root.styleSheets.Add(StylesheetSetup());
+            root.ToUSS(nameof(root));
 
-            root.RegisterCallback<GeometryChangedEvent>(DeferredExecution);
+            // root.RegisterCallback<GeometryChangedEvent>(DeferredExecution);
 
             var exampleInspectorContainer = new VisualElement();
             exampleInspectorContainer.NameAsUSS(nameof(exampleInspectorContainer));
@@ -118,9 +125,9 @@ namespace instance.id.EATK.Examples
             var healthContainer = new VisualElement();
             healthContainer.NameAsUSS(nameof(healthContainer));
 
-             var healthLabel = new AnimatedLabel {text = "Max Health"};
+            var healthLabel = new AnimatedLabel {text = "Max Health"};
             healthLabel.NameAsUSS(nameof(healthLabel));
-             labelData.Add(healthLabel);
+            labelData.Add(healthLabel);
             healthContainer.Add(healthLabel);
 
             var exampleHealth = new IntegerField {bindingPath = serializedObject.FindProperty("health").propertyPath};
@@ -133,7 +140,7 @@ namespace instance.id.EATK.Examples
 
             var manaLabel = new AnimatedLabel {text = "Max Mana"};
             manaLabel.NameAsUSS(nameof(manaLabel));
-             labelData.Add(manaLabel);
+            labelData.Add(manaLabel);
             manaContainer.Add(manaLabel);
 
             var exampleMana = new IntegerField {bindingPath = serializedObject.FindProperty("mana").propertyPath};
@@ -147,7 +154,7 @@ namespace instance.id.EATK.Examples
 
             var livesLabel = new AnimatedLabel {text = "Resurrections"};
             livesLabel.NameAsUSS(nameof(livesLabel));
-             labelData.Add(livesLabel);
+            labelData.Add(livesLabel);
             livesContainer.Add(livesLabel);
 
             var exampleLives = new IntegerField {bindingPath = serializedObject.FindProperty("lives").propertyPath};
@@ -189,17 +196,23 @@ namespace instance.id.EATK.Examples
             exampleInspectorContainer.Add(exampleIsNPC);
             exampleInspectorContainer.Add(exampleSpawnLocation);
             root.Add(exampleInspectorContainer);
+
             return root;
         }
 
         private void DeferredExecution(GeometryChangedEvent evt)
         {
             root.UnregisterCallback<GeometryChangedEvent>(DeferredExecution);
+            base.LoadingCompleted(root, target);
+
+            SetupHighlighter();
+
+            bool doExpand = false;
 
             // @formatter:off
-            void First() { root.schedule.Execute(() => characterDetailsFoldout.value = true).StartingIn(0); }
-            void Second() { root.schedule.Execute(() => characterVitalsFoldout.value = true).StartingIn(0); }
-            void Third() { root.schedule.Execute(() => characterWeaponListFoldout.value = true).StartingIn(0); DoLabels(); } // @formatter:on
+            void First() { if (doExpand) root.schedule.Execute(() => characterDetailsFoldout.value = true).StartingIn(0); }
+            void Second() { if (doExpand) root.schedule.Execute(() => characterVitalsFoldout.value = true).StartingIn(0); }
+            void Third() { if (doExpand) root.schedule.Execute(() => characterWeaponListFoldout.value = true).StartingIn(0); /*DoLabels();*/ } // @formatter:on
 
             var charDetailLabel = characterDetailsFoldout.Query<Label>().First();
             var charVitalsLabel = characterVitalsFoldout.Query<Label>().First();
@@ -214,12 +227,148 @@ namespace instance.id.EATK.Examples
                 var cascade = 100;
                 labelData.ForEach(l =>
                 {
-                    l.schedule.Execute(() =>{
-                        l.AnimCharacterSequence("#BABABA".FromHex(), "#2F569C".FromHex(), 50, 150);
+                    l.schedule.Execute(() =>
+                    {
+                        l.AnimCharacterSequence(
+                            "#BABABA".FromHex(),
+                            "#2F569C".FromHex(),
+                            50,
+                            150);
                     }).StartingIn(cascade += 300);
                 });
             }
+        }
 
+        private VisualElement headerContainer;
+        private VisualElement containerElement;
+        private IVisualElementScheduledItem headerHighlighter;
+        private IVisualElementScheduledItem containerHighlighter;
+
+        int color1Duration = 500;
+        int color2Duration = 500;
+        int durationBuffer = 20;
+
+        private void SetupHighlighter()
+        {
+            inspectorElements = exampleComponent.inspectorElements;
+            // -- Highlighter Setup --------------------------------------
+
+            // -- EditorElement ------------------------------------------
+            TypeCache.GetTypesDerivedFrom(typeof(VisualElement))
+                .ToList()
+                .FirstOrDefault(x => x.Name == "EditorElement")
+                .GetFirstAncestorOfType<VisualElement>(root, out containerElement);
+
+            containerElement.styleSheets.Add(editorType.GetStyleSheet("HighlighterStyle"));
+
+            if (containerElement != null)
+            {
+                containerElement.AddToClassList("addHighlightBorder");
+                inspectorElements.TryAddValue(containerElement);
+
+                void Cleanup()
+                {
+                    headerContainer.SetBorderColor();
+                }
+
+                containerHighlighter = containerElement.AnimBorderPulse(
+                    color1: GetColor.FromHex("#3A82E7"),
+                    color2: GetColor.FromHex("#7F3B3A"),
+                    original: default,
+                    color1DurationMs: color1Duration,
+                    color2DurationMs: color2Duration,
+                    callback: Cleanup,
+                    borderSelection: exampleComponent.containerBorders);
+                containerHighlighter.Pause();
+            }
+
+            var headerElement = containerElement
+                .Children()
+                .FirstOrDefault(x => x.name.Contains("(Script)Header"));
+            inspectorElements.TryAddValue(headerElement);
+
+            // -- Header Setup -------------------------------------------
+            if (headerElement != null)
+            {
+                new VisualElement()
+                    .Create(out headerContainer)
+                    .ToUSS(nameof(headerContainer))
+                    .SetParent(containerElement, 0);
+
+                headerElement.SetParent(headerContainer);
+                headerContainer.AddToClassList("addHighlightBorder");
+
+                void Cleanup()
+                {
+                    headerContainer.SetBorderColor();
+                }
+
+                headerHighlighter = headerContainer.AnimBorderPulse(
+                    color1: GetColor.FromHex("#3A82E7"),
+                    color2: GetColor.FromHex("#7F3B3A"),
+                    original: default,
+                    color1DurationMs: color1Duration,
+                    color2DurationMs: color2Duration,
+                    callback: Cleanup,
+                    borderSelection: exampleComponent.headerBorders);
+                headerHighlighter.Pause();
+            }
+        }
+
+        private List<VisualElement> inspectorElements;
+
+        private void HighLightComponent(string componentTarget)
+        {
+            switch (componentTarget)
+            {
+                case string a when a == "container":
+                    HighlightContainer();
+                    break;
+                case string a when a == "header":
+                    HighlightHeader();
+                    break;
+            }
+        }
+
+        private void ResetColors()
+        {
+        }
+
+        private void HighlightContainer()
+        {
+            if (containerElement != null)
+            {
+                if (!containerHighlighter.isActive)
+                {
+                    containerHighlighter.ExecuteLater(0);
+                }
+                else
+                {
+                    containerHighlighter.Pause();
+                    containerElement.SetBorderColorAction()
+                        .ExecuteIn(containerElement, 200);
+                }
+            }
+            else Debug.Log("ContainerElement not found");
+        }
+
+        private void HighlightHeader()
+        {
+            if (headerContainer != null)
+            {
+                if (!headerHighlighter.isActive)
+                {
+                    headerHighlighter.ExecuteLater(0);
+                }
+                else
+                {
+                    headerHighlighter.Pause();
+                    headerContainer
+                        .SetBorderColorAction()
+                        .ExecuteIn(headerContainer, 200);
+                }
+            }
+            else Debug.Log("HeaderElement not found");
         }
     }
 }

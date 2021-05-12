@@ -106,3 +106,5 @@ crashlytics-build.properties
 /Packages/AngleSharp.1.0.0-alpha-844/
 /Packages/System.Runtime.CompilerServices.Unsafe.4.5.0/
 /Packages/System.Text.Encoding.CodePages.4.5.0/
+
+.bak/
