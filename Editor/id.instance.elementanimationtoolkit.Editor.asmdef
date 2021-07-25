@@ -1,8 +1,10 @@
 {
     "name": "id.instance.elementanimationtoolkit.Editor",
+    "rootNamespace": "",
     "references": [
         "id.instance.elementanimationtoolkit",
-        "id.instance.extensions"
+        "id.instance.extensions",
+        "id.instance.extensions.Editor"
     ],
     "includePlatforms": [
         "Editor"

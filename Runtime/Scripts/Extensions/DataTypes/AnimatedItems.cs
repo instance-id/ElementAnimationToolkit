@@ -7,7 +7,7 @@ using System.Collections.Generic;
 using UnityEngine.UIElements;
 using UnityEngine.UIElements.Experimental;
 
-namespace instance.id.EATK.Extensions
+namespace instance.id.EATK
 {
     public class AnimatedItems
     {
