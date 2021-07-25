@@ -1,9 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using instance.id.EATK.Editors;
 using instance.id.EATK.Extensions;
-using instance.id.Extensions;
 using JetBrains.Annotations;
 using UnityEditor;
 using UnityEditor.UIElements;
@@ -13,7 +11,7 @@ using UnityEngine.UIElements;
 namespace instance.id.EATK.Examples
 {
     [CustomEditor(typeof(ExampleComponent))]
-    public class ExampleComponentEditor : DefaultUIElementsEditor
+    public class ExampleComponentEditor : Editor
     {
         private VisualElement root;
         private ExampleComponent exampleComponent;
@@ -203,7 +201,7 @@ namespace instance.id.EATK.Examples
         private void DeferredExecution(GeometryChangedEvent evt)
         {
             root.UnregisterCallback<GeometryChangedEvent>(DeferredExecution);
-            base.LoadingCompleted(root, target);
+            // base.LoadingCompleted(root, target);
 
             SetupHighlighter();
 
@@ -272,8 +270,8 @@ namespace instance.id.EATK.Examples
                 }
 
                 containerHighlighter = containerElement.AnimBorderPulse(
-                    color1: GetColor.FromHex("#3A82E7"),
-                    color2: GetColor.FromHex("#7F3B3A"),
+                    color1: ColorUtil.FromHex("#3A82E7"),
+                    color2: ColorUtil.FromHex("#7F3B3A"),
                     original: default,
                     color1DurationMs: color1Duration,
                     color2DurationMs: color2Duration,
@@ -304,8 +302,8 @@ namespace instance.id.EATK.Examples
                 }
 
                 headerHighlighter = headerContainer.AnimBorderPulse(
-                    color1: GetColor.FromHex("#3A82E7"),
-                    color2: GetColor.FromHex("#7F3B3A"),
+                    color1: ColorUtil.FromHex("#3A82E7"),
+                    color2: ColorUtil.FromHex("#7F3B3A"),
                     original: default,
                     color1DurationMs: color1Duration,
                     color2DurationMs: color2Duration,

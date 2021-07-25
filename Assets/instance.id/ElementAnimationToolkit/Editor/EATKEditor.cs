@@ -9,7 +9,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using instance.id.EATK.Extensions;
-using instance.id.Extensions;
 using JetBrains.Annotations;
 using UnityEditor;
 using UnityEditor.UIElements;
@@ -101,9 +100,9 @@ namespace instance.id.EATK
             animatedIcon = (Texture2D) EditorGUIUtility.IconContent("ScriptableObject Icon").image;
 
             // -- Color Assignments -----------------------
-            originalColor = GetColor.FromHex("#BABABA");
-            pulseStartColor = GetColor.FromHex("#7F3B3A");
-            pulseEndColor = GetColor.FromHex("#607FAE");
+            originalColor = ColorUtil.FromHex("#BABABA");
+            pulseStartColor = ColorUtil.FromHex("#7F3B3A");
+            pulseEndColor = ColorUtil.FromHex("#607FAE");
         }
 
         private StyleSheet StylesheetSetup()
@@ -277,8 +276,8 @@ namespace instance.id.EATK
 
             // -- Register the HoverBorderPulse callback                          --
             toolbarInfo.HoverBorderPulse(
-                pulseStartColor: GetColor.FromHex("#7F3B3A"),
-                pulseEndColor: GetColor.FromHex("#2F569C"),
+                pulseStartColor: ColorUtil.FromHex("#7F3B3A"),
+                pulseEndColor: ColorUtil.FromHex("#2F569C"),
                 colorDuration: 500);
         }
 
@@ -754,7 +753,7 @@ namespace instance.id.EATK
             // -- AnimatedFoldout values ------------------
             var openDelayMs = 500;
             var closeDelayMs = 4500;
-            var animatedColor = GetColor.FromHex("#2F569C");
+            var animatedColor = ColorUtil.FromHex("#2F569C");
 
             // -- Animated Label values -------------------
             var cascadeMs = 50;
@@ -802,7 +801,7 @@ namespace instance.id.EATK
 
             instanceidLabel.AnimCharacterSequence(
                 color1: originalColor,
-                color2: GetColor.FromHex("#2F569C"),
+                color2: ColorUtil.FromHex("#2F569C"),
                 cascadeMs: cascadeMs,
                 durationMS: durationMs);
         }
@@ -816,8 +815,8 @@ namespace instance.id.EATK
         private void ButtonCascadeAnimation() // @formatter:on
         {
             // -- Image colors ------------------
-            var buttonColor = GetColor.FromHex("#676767");
-            var endButtonColor = GetColor.FromHex("#2F569C");
+            var buttonColor = ColorUtil.FromHex("#676767");
+            var endButtonColor = ColorUtil.FromHex("#2F569C");
             const int durationInMs = 500;
             const int delayInMs = 1000;
 
@@ -910,9 +909,9 @@ namespace instance.id.EATK
             const int durationMs = 500;
             const int inDurationMs = 300;
             const int outDurationMs = 150;
-            var hoverLabelColor = GetColor.FromHex("#2F569C");
-            var originalInfoBgColor = GetColor.FromHex("#303030");
-            var toolbarHoverColor = GetColor.FromHex("#2F569C");
+            var hoverLabelColor = ColorUtil.FromHex("#2F569C");
+            var originalInfoBgColor = ColorUtil.FromHex("#303030");
+            var toolbarHoverColor = ColorUtil.FromHex("#2F569C");
 
             // -- Local Func which is used as a callback for AnimateWidth()  --
             // -- so that when the large => small animation completes,       --
@@ -970,7 +969,7 @@ namespace instance.id.EATK
                 menuInfoContainer.schedule.Execute(() =>
                 {
                     var menupg = VisualElementBaseAnimation.AnimateBackgroundColor(menuInfoContainer, startColor: originalInfoBgColor,
-                        endColor: GetColor.FromHex("#212121"),
+                        endColor: ColorUtil.FromHex("#212121"),
                         durationMs: 600);
                     menupg.Start();
                 }).StartingIn(0);
@@ -1034,7 +1033,7 @@ namespace instance.id.EATK
 
                 menuInfoContainer.schedule.Execute(() =>
                 {
-                    VisualElementBaseAnimation.AnimateBackgroundColor(menuInfoContainer, GetColor.FromHex("#212121"),
+                    VisualElementBaseAnimation.AnimateBackgroundColor(menuInfoContainer, ColorUtil.FromHex("#212121"),
                         originalInfoBgColor,
                         400);
                 }).StartingIn(0);
@@ -1055,8 +1054,8 @@ namespace instance.id.EATK
         private void ImageAnimation(VisualElement imageButton, Func<float, float> easing = null) // @formatter:on
         {
             // -- Image colors ------------------
-            var originalImageColor = GetColor.FromHex("#000000");
-            var targetImageColor = GetColor.FromHex("#607FAE");
+            var originalImageColor = ColorUtil.FromHex("#000000");
+            var targetImageColor = ColorUtil.FromHex("#607FAE");
             const int durationInMs = 1000;
             const int delayInMs = 1000;
 
@@ -1091,8 +1090,8 @@ namespace instance.id.EATK
             const int fadeOutTime = 500;
 
             const string newText = "then back to the original!";
-            var originalTextColor = GetColor.FromHex("#BABABA");
-            var animatedTextColor = GetColor.FromHex("#607FAE");
+            var originalTextColor = ColorUtil.FromHex("#BABABA");
+            var animatedTextColor = ColorUtil.FromHex("#607FAE");
 
             fadeTextAnimationLabel.AnimFadeInSequence(
                 newText,
@@ -1110,10 +1109,10 @@ namespace instance.id.EATK
         {
             // -- Background colors -------------
             var originalBackgroundColor = new StyleColor(StyleKeyword.Initial).value;
-            var targetBackgroundColor = GetColor.FromHex("#607FAE");
+            var targetBackgroundColor = ColorUtil.FromHex("#607FAE");
             // -- Text colors -------------------
-            var originalTextColor = GetColor.FromHex("#BABABA");
-            var targetTextColor = GetColor.FromHex("#000000");
+            var originalTextColor = ColorUtil.FromHex("#BABABA");
+            var targetTextColor = ColorUtil.FromHex("#000000");
             // -- Duration values ---------------
             const int backgroundDurationMs = 500;
             const int textDurationMs = 500;
@@ -1170,7 +1169,7 @@ namespace instance.id.EATK
             const int durationInMs = 1000;
             const int delayInMs = 1000;
 
-            widthChangeAnimationLabel.SetBorderColor(GetColor.FromHex("#6B7DFF"));
+            widthChangeAnimationLabel.SetBorderColor(ColorUtil.FromHex("#6B7DFF"));
             widthAnimateFrom = widthChangeAnimationLabel.AnimateWidth(
                 currentWidth,
                 desiredWidth,
@@ -1211,7 +1210,7 @@ namespace instance.id.EATK
 
             // -- Not necessarily needed, they just help --
             // -- make the demo cleaner while animating  --
-            heightChangeAnimationLabel.SetBorderColor(GetColor.FromHex("#6B7DFF"));
+            heightChangeAnimationLabel.SetBorderColor(ColorUtil.FromHex("#6B7DFF"));
             button.style.alignSelf = Align.FlexStart;
             buttonContainer.style.alignSelf = Align.FlexStart;
             buttonContainer.style.paddingTop = 1;

@@ -3,11 +3,11 @@
 	"name": "id.instance.elementanimationtoolkit",
 	"displayName": "Element Animation Toolkit",
 	"repositoryName": "Element Animation Toolkit",
-	"version": "0.1.6",
+	"version": "0.1.7",
 	"description": "A collection of Unity UIElements standalone animations, new animated elements, and examples.",
 	"type": "library",
 	"unity": "2019.4",
-	"unityRelease": "20f1",
+	"unityRelease": "28f1",
 	"keywords": [
 		"UI Elements",
 		"UIElements",
