@@ -9,7 +9,7 @@ using UnityEngine.UIElements.Experimental;
 
 namespace instance.id.EATK
 {
-    public class AnimatedItems
+    public class AnimatedItems  
     {
         private string elementName;
         private VisualElement element;
@@ -25,10 +25,7 @@ namespace instance.id.EATK
             animatedItemList = new List<ValueAnimation<StyleValues>>();
         }
 
-        public void CopyToArray()
-        {
-            animatedItemArray = animatedItemList.ToArray();
-        }
+        public void CopyToArray() => animatedItemArray = animatedItemList.ToArray();
 
         // ---------------------------------------------------- Properties
         // ---------------------------------------------------------------
@@ -55,6 +52,36 @@ namespace instance.id.EATK
             get => animatedItemArray;
             set => animatedItemArray = value;
         }
+    }
+    
+    public class AnimatedItems<TEventType> : AnimatedItems
+    {
+        private EventCallback<TEventType> eventCallback;
+        public EventCallback<TEventType> EventCallback
+        {
+            get => eventCallback;
+            set => eventCallback = value;
+        }
+        
+        private List<EventCallback<TEventType>> eventCallbacks;
+        public List<EventCallback<TEventType>> EventCallbacks
+        {
+            get => eventCallbacks;
+            set => eventCallbacks = value;
+        }
 
+        public AnimatedItems(VisualElement ele) : base(ele) { }
+    }
+
+    public class AnimatedItems<TEventType, T2EventType> : AnimatedItems
+    {
+        private (EventCallback<TEventType> mouseOverEvent, EventCallback<T2EventType> mouseOutEvent) eventCallbacks;
+        public (EventCallback<TEventType> mouseOverEvent, EventCallback<T2EventType> mouseOutEvent) EventCallbacks
+        {
+            get => eventCallbacks;
+            set => eventCallbacks = value;
+        }
+
+        public AnimatedItems(VisualElement ele) : base(ele) { }
     }
 }
