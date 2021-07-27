@@ -52,7 +52,7 @@ There are several fairly basic base animation helper methods which can easily be
 ![](media/background_fade_example.gif)  
  (The initial fade from gray to blue)
 
-<details>
+<details open>
 <summary>Example animation base helper: AnimateBackgroundColor()</summary>
 Usage:
 
@@ -73,7 +73,7 @@ visualElement.AnimateBackgroundColor(originalColor, fadeColor, durationOfFade);
 
 ### Hover Border Pulse
 ![](media/hoverborderpulse_example.gif)  
-<details>
+<details open>
 <summary>Example hover animation: HoverBorderPulse()</summary>
 
 Usage:
@@ -85,12 +85,66 @@ visualElement.HoverBorderPulse(pulseStartColor: GetColor.FromHex("#7F3B3A"), pul
 
 </details>
 
+<details open>
+<summary>Example: HoverBorderPulse() return: AnimatedItems class</summary>
+
+```c#
+private VisualElement ve1 = new VisualElement();
+private VisualElement ve2 = new VisualElement();
+private VisualElement ve3 = new VisualElement();
+private List<AnimatedItems<MouseOverEvent, MouseOutEvent>> animatedItems = new List<AnimatedItems<MouseOverEvent, MouseOutEvent>>();
+
+private void RegisterHoverEvents()
+{
+    // -- Register Hover animations ---------- 
+    // -- HoverBorderPulse returns an AnimatedItems class (this example returns AnimatedItems<MouseOverEvent, MouseOutEvent>)
+    // -- We add the returned AnimatedItems object to a List for each event registration
+    animatedItems.Add(
+        ve1.HoverBorderPulse(
+            "#2F569C".FromHex(),
+            "#D2A00C".FromHex(),
+            includeChildren: true
+        )
+    );
+
+    animatedItems.Add(
+        ve2.HoverBorderPulse(
+            "#2F569C".FromHex(),
+            "#D2A00C".FromHex(),
+            includeChildren: true
+        )
+    );
+
+    animatedItems.Add(
+        ve3.HoverBorderPulse(
+            "#2F569C".FromHex(),
+            "#D2A00C".FromHex(),
+            includeChildren: true
+        )
+    );
+}
+
+private void UnregisterHoverEvents()
+{
+    // -- We can iterate over the AnimatedItems list, as it contains the target VisualElement, the ValueAnimation properties used, 
+    // -- as well as the EventCallback used to register the event, which allows you to manually unregister it, should you need.
+    animatedItems.ForEach(v =>
+    {
+        v.Element.UnregisterCallback(v.EventCallbacks.mouseOverEvent);
+        v.Element.UnregisterCallback(v.EventCallbacks.mouseOutEvent);
+    });
+}
+ 
+```
+
+</details>
+
 ---
 
 ### Fade-in sequence
 ![](media/fade_example.gif)
 
-<details>
+<details open>
 <summary>Example complex animation sequence: AnimFadeInSequence()</summary>
  
 Usage:
