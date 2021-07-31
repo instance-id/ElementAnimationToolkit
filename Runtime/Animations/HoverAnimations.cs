@@ -6,6 +6,7 @@
 #if UNITY_EDITOR
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.UIElements;
 using UnityEngine.UIElements.Experimental;
@@ -211,32 +212,34 @@ namespace instance.id.EATK
 
         // -------------------------------------------------- @HoverBorder
         // ---------------------------------------------------------------
-        /// <summary>
-        /// Adds background hover capability that will not be lost like CSS:hover when programatically setting background color
-        /// 
-        /// ** To help combat your element shifting position slightly when a border is applied on hover,
-        /// it is a good idea to add a border to your element before hand and just set color to 'initial'
-        /// so that it is transparent, then keep 'addBorder' parameter as false.
-        /// </summary>
-        /// <param name="target">The element in which this function will be applied</param>
-        /// <param name="pulseStartColor">The first color</param>
-        /// <param name="pulseEndColor">The second color</param>
-        /// <param name="original">The original color of the element being changed. Can be obtained and passed via 'visualElement.style.backgroundColor.value'</param>
-        /// <param name="addBorder">Adds a border if the element does not have one already</param>
-        /// <param name="borderStartEndWidth">The width in which the borders should be when displaying</param>
-        /// <param name="colorDuration">The duration of each colors cycle</param>
-        /// <param name="includeChildren">Register child elements for the hover event</param>
-        /// <param name="stopPropagation">Stop event from propagating further </param>
-        /// <returns>Tuple of type (EventCallback&lt;MouseOverEvent&gt; mouseOverEvent, EventCallback&lt;MouseOutEvent&gt; mouseOutEvent) which can be used for manually invoking or unregistering the events when no longer needed</returns>
-        /// <example>
-        ///<code>
-        /// var myHoverEvents = myVisualElement.HoverBorderPulse("#2F569C".FromHex(), "#D2A00C".FromHex(), includeChildren: true);
-        /// ...
-        /// myVisualElement.UnregisterCallback(myHoverEvents.mouseOverEvent, true);
-        /// myVisualElement.UnregisterCallback(myHoverEvents.mouseOutEvent, true);
-        /// </code>
-        /// </example>
-        public static AnimatedItems<MouseOverEvent,MouseOutEvent>
+        ///  <summary>
+        ///  Adds background hover capability that will not be lost like CSS:hover when programatically setting background color
+        ///  
+        ///  ** To help combat your element shifting position slightly when a border is applied on hover,
+        ///  it is a good idea to add a border to your element before hand and just set color to 'initial'
+        ///  so that it is transparent, then keep 'addBorder' parameter as false.
+        ///  </summary>
+        ///  <param name="target">The element in which this function will be applied</param>
+        ///  <param name="pulseStartColor">The first color</param>
+        ///  <param name="pulseEndColor">The second color</param>
+        ///  <param name="original">The original color of the element being changed. Can be obtained and passed via 'visualElement.style.backgroundColor.value'</param>
+        ///  <param name="addBorder">Adds a border if the element does not have one already</param>
+        ///  <param name="borderStartEndWidth">The width in which the borders should be when displaying</param>
+        ///  <param name="colorDuration">The duration of each colors cycle</param>
+        ///  <param name="includeChildren">Register child elements for the hover event</param>
+        ///  <param name="stopPropagation">Stop event from propagating further </param>
+        ///  <param name="useTrickleDown"><see cref="TrickleDown"/></param>
+        ///  <param name="animRunCheck">If any external ValueAnimation&lt;StyleValues&gt; items are passed, their current animation status will be checked, if any are currently running, this animation will not start until it is completed</param>
+        ///  <returns>Tuple of type (EventCallback&lt;MouseOverEvent&gt; mouseOverEvent, EventCallback&lt;MouseOutEvent&gt; mouseOutEvent) which can be used for manually invoking or unregistering the events when no longer needed</returns>
+        ///  <example>
+        /// <code>
+        ///  var myHoverEvents = myVisualElement.HoverBorderPulse("#2F569C".FromHex(), "#D2A00C".FromHex(), includeChildren: true);
+        ///  ...
+        ///  myVisualElement.UnregisterCallback(myHoverEvents.mouseOverEvent, true);
+        ///  myVisualElement.UnregisterCallback(myHoverEvents.mouseOutEvent, true);
+        ///  </code>
+        ///  </example>
+        public static AnimatedItems<MouseOverEvent, MouseOutEvent>
             HoverBorderPulse(
             this VisualElement target,
             Color pulseStartColor,
@@ -246,18 +249,30 @@ namespace instance.id.EATK
             Vector2 borderStartEndWidth = default,
             int colorDuration = 1000,
             bool includeChildren = true,
-            bool stopPropagation = true)
+            bool stopPropagation = true,
+            TrickleDown useTrickleDown = TrickleDown.NoTrickleDown,
+            AnimatedItems<MouseOverEvent, MouseOutEvent> animatedItems = null,
+            params ValueAnimation<StyleValues>[] animRunCheck)
         {
             if (borderStartEndWidth == default)
                 borderStartEndWidth = new Vector2(1, 0);
 
+            var doHover = false;
             var pulseIn = new ValueAnimation<StyleValues>();
             var pulseOut = new ValueAnimation<StyleValues>();
             IVisualElementScheduledItem repeatedAnim = null;
-            var doHover = false;
+
+            if (animatedItems == null)
+                animatedItems = new AnimatedItems<MouseOverEvent, MouseOutEvent>(target);
 
             EventCallback<MouseOverEvent> mouseOverEvent = evt =>
             {
+                if (animRunCheck.Length > 0)
+                    if (animRunCheck.Any(t => t.isRunning))
+                        return;
+
+                if (!animatedItems.AllowRun) return;
+
                 repeatedAnim = null;
                 doHover = true;
                 if (addBorder)
@@ -294,10 +309,11 @@ namespace instance.id.EATK
 
             EventCallback<MouseOutEvent> mouseOutEvent = evt =>
             {
+                if (!animatedItems.AllowRun) return;
                 doHover = false;
                 if (pulseIn.isRunning) pulseIn?.Stop();
                 if (pulseOut.isRunning) pulseOut?.Stop();
-                if (repeatedAnim.isActive)
+                if (repeatedAnim != null && repeatedAnim.isActive)
                 {
                     repeatedAnim.Pause();
                 }
@@ -320,20 +336,23 @@ namespace instance.id.EATK
                 if (stopPropagation) evt.StopPropagation();
             };
 
-            target.RegisterCallback(mouseOverEvent, includeChildren);
-            target.RegisterCallback(mouseOutEvent, includeChildren);
+            target.RegisterCallback(mouseOverEvent, includeChildren, useTrickleDown);
+            target.RegisterCallback(mouseOutEvent, includeChildren, useTrickleDown);
 
-            return new AnimatedItems<MouseOverEvent,MouseOutEvent>(target)
-            {
-                AnimatedItemList = new List<ValueAnimation<StyleValues>> { pulseIn, pulseOut }, 
-                EventCallbacks = (mouseOverEvent, mouseOutEvent) 
-            };
+            animatedItems.AnimatedItemList = new List<ValueAnimation<StyleValues>> { pulseIn, pulseOut };
+            animatedItems.EventCallbacks = (mouseOverEvent, mouseOutEvent);
+            return animatedItems;
         }
 
         #region Unregister
 
-        public static void HoverBorderPulseUnregister(this VisualElement target, Color pulseStartColor, Color pulseEndColor, Color original = default, bool addBorder = false,
-        Vector2 borderStartEndWidth = default, int colorDuration = 1000, bool includeChildren = true, bool stopPropagation = true)
+        public static void HoverBorderPulseUnregister(
+        this VisualElement target, Color pulseStartColor, Color pulseEndColor, Color original = default, bool addBorder = false,
+        Vector2 borderStartEndWidth = default,
+        int colorDuration = 1000,
+        bool includeChildren = true,
+        bool stopPropagation = true,
+        TrickleDown useTrickleDown = TrickleDown.NoTrickleDown)
         {
             if (borderStartEndWidth == default)
                 borderStartEndWidth = new Vector2(1, 0);
@@ -414,11 +433,13 @@ namespace instance.id.EATK
         // -------------------------------------------------------- @HoverWidth
         // -- Animate the width of target element to desired value on hover  --
         // --------------------------------------------------------------------
-        public static AnimatedItems HoverWidth(this VisualElement target, float initialWidth = 0f, float desiredWidth = 100f, int duration = 1000, Action hoverCallback = null,
+        public static AnimatedItems<MouseOverEvent, MouseOutEvent> HoverWidth(
+        this VisualElement target, float initialWidth = 0f, float desiredWidth = 100f, int duration = 1000, Action hoverCallback = null,
         Action leaveCallback = null,
         bool afterAnimation = false,
         bool includeChildren = true,
-        bool stopPropagation = true)
+        bool stopPropagation = true,
+        TrickleDown useTrickleDown = TrickleDown.NoTrickleDown)
         {
             initialWidth = initialWidth == 0f ? target.resolvedStyle.width : initialWidth;
             var enterAnim = new ValueAnimation<StyleValues>();
@@ -438,14 +459,15 @@ namespace instance.id.EATK
             } // @formatter:off
             void MouseLeave() { leaveAnim.Start(); } // @formatter:on
 
-            EventCallback<MouseOverEvent> mouseOverEvent = evt => { 
+            EventCallback<MouseOverEvent> mouseOverEvent = evt =>
+            {
                 if (enterAnim.isRunning) enterAnim.Stop();
                 if (leaveAnim.isRunning) leaveAnim.Stop();
                 MouseEnter();
                 if (!afterAnimation) hoverCallback?.Invoke();
-                if (stopPropagation) evt.StopPropagation(); 
+                if (stopPropagation) evt.StopPropagation();
             };
-            
+
             EventCallback<MouseOutEvent> mouseOutEvent = evt =>
             {
                 if (enterAnim.isRunning) enterAnim.Stop();
@@ -455,20 +477,25 @@ namespace instance.id.EATK
                 target.schedule.Execute(leaveCallback).StartingIn(duration);
             };
 
-            target.RegisterCallback(mouseOverEvent, includeChildren);
-            target.RegisterCallback(mouseOutEvent, includeChildren);
+            target.RegisterCallback(mouseOverEvent, includeChildren, useTrickleDown);
+            target.RegisterCallback(mouseOutEvent, includeChildren, useTrickleDown);
 
-            return new AnimatedItems<MouseOverEvent,MouseOutEvent>(target)
+            return new AnimatedItems<MouseOverEvent, MouseOutEvent>(target)
             {
-                AnimatedItemList = new List<ValueAnimation<StyleValues>> { enterAnim, leaveAnim }, 
-                EventCallbacks =  (mouseOverEvent, mouseOutEvent)
+                AnimatedItemList = new List<ValueAnimation<StyleValues>> { enterAnim, leaveAnim },
+                EventCallbacks = (mouseOverEvent, mouseOutEvent)
             };
         }
 
         // ------------------------------------------------------- @HoverHeight
         // -- Animate the Height of target element to desired value on hover --
         // --------------------------------------------------------------------
-        public static AnimatedItems HoverHeight(this VisualElement target, float initialHeight = 0f, float desiredHeight = 100f, int duration = 1000, Action hoverCallback = null,
+        public static AnimatedItems<MouseOverEvent, MouseOutEvent> HoverHeight(
+        this VisualElement target,
+        float initialHeight = 0f,
+        float desiredHeight = 100f,
+        int duration = 1000,
+        Action hoverCallback = null,
         Action leaveCallback = null,
         bool afterAnimation = false)
         {
@@ -492,7 +519,7 @@ namespace instance.id.EATK
                 if (!afterAnimation) hoverCallback?.Invoke();
                 evt.StopPropagation();
             };
-            
+
             EventCallback<MouseOutEvent> mouseOutEvent = evt =>
             {
                 if (enterAnim.isRunning) enterAnim.Stop();
@@ -504,11 +531,11 @@ namespace instance.id.EATK
 
             target.RegisterCallback(mouseOverEvent);
             target.RegisterCallback(mouseOutEvent);
-            
-            return new AnimatedItems<MouseOverEvent,MouseOutEvent>(target)
+
+            return new AnimatedItems<MouseOverEvent, MouseOutEvent>(target)
             {
-                AnimatedItemList = new List<ValueAnimation<StyleValues>> { enterAnim, leaveAnim }, 
-                EventCallbacks = (mouseOverEvent, mouseOutEvent) 
+                AnimatedItemList = new List<ValueAnimation<StyleValues>> { enterAnim, leaveAnim },
+                EventCallbacks = (mouseOverEvent, mouseOutEvent)
             };
         }
 

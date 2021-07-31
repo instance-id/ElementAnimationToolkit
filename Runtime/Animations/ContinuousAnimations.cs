@@ -2,6 +2,7 @@
 // -- Project : https://github.com/instance-id/ElementAnimationToolkit       --
 // -- instance.id 2020 | http://github.com/instance-id | http://instance.id  --
 // ----------------------------------------------------------------------------
+
 #if UNITY_EDITOR
 using System;
 using instance.id.EATK.Extensions;
@@ -36,12 +37,14 @@ namespace instance.id.EATK
         /// <param name="borderSelection">The parameters of the Vector4(1-4) represent which borders should have their colors changed: 1(x) = left, 2(y) = top, 3(z) = right, 4(w) = bottom.
         /// If only the top and bottom borders are desired to pulse, you would pass new Vector4(0, 1, 0, 1)</param>
         public static IVisualElementScheduledItem AnimBorderPulse(this VisualElement element, Color color1, Color color2, Color original = default,
-            int color1DurationMs = 1000,
-            int color2DurationMs = 1000,
-            bool addBorder = false,
-            Vector2 borderStartEndWidth = default,
-            Action callback = null,
-            Vector4 borderSelection = default)
+        int color1DurationMs = 1000,
+        int color2DurationMs = 1000,
+        bool addBorder = false,
+        Vector2 borderStartEndWidth = default,
+        Action callback = null,
+        Vector4 borderSelection = default,
+        IVisualElementScheduledItem repeatedAnim = default
+        )
         {
             if (borderStartEndWidth == default)
                 borderStartEndWidth = new Vector2(1, 0);
@@ -49,7 +52,10 @@ namespace instance.id.EATK
             bool doBorderPulse;
             var pulseIn = new ValueAnimation<StyleValues>();
             var pulseOut = new ValueAnimation<StyleValues>();
-            IVisualElementScheduledItem repeatedAnim = null;
+            pulseIn.autoRecycle = true;
+            pulseOut.autoRecycle = true;
+            pulseIn.KeepAlive();
+            pulseOut.KeepAlive();
 
             doBorderPulse = true;
             if (addBorder) element.SetBorderWidth(borderStartEndWidth.x);
@@ -131,12 +137,13 @@ namespace instance.id.EATK
             {
                 if (pulseOut.isRunning) pulseOut.Stop();
                 if (pulseIn.isRunning) pulseIn.Stop();
+
                 element.SetBorderColor();
-                callback?.Invoke();
                 if (addBorder) element.SetBorderWidth(borderStartEndWidth.y);
                 if (borderSelection != default) ReplaceBorderValues();
+                callback?.Invoke();
             } // @formatter:off
-
+            
             // -- Pulse color will fade original => desired color   --
             // -- via the AnimateTo local function. Once completed  --
             // -- the AnimateFrom function is called animating back --
@@ -146,31 +153,31 @@ namespace instance.id.EATK
             {
                 if (!repeated.isActive) { DoCleanup(); return; }
                 if (pulseOut.isRunning) pulseOut.Stop();
-                callback?.Invoke();
                 pulseIn = element.AnimateBorderColor(
                     color1,
                     color2,
                     color1DurationMs,
-                    () => PulseOut(repeated));
+                    () => PulseOut(repeated)).KeepAlive();
             }
 
             void PulseOut(IVisualElementScheduledItem repeated)
             {
                 if (!repeated.isActive) { DoCleanup(); return; }
                 if (pulseIn.isRunning) pulseIn.Stop();
-                callback?.Invoke();
                 pulseOut = element.AnimateBorderColor(
                     color2,
                     color1,
-                    color2DurationMs);
+                    color2DurationMs, () => { if(!repeated.isActive) DoCleanup();}).KeepAlive();
             } // @formatter:on
 
             var recurring = color1DurationMs + color2DurationMs + 20;
+
             repeatedAnim = element.schedule
-                .Execute(() => PulseIn(repeatedAnim))
+                .Execute(() => { PulseIn(repeatedAnim); })
                 .StartingIn(0)
                 .Every(recurring)
                 .Until(() => !doBorderPulse);
+
             return repeatedAnim;
         }
     }

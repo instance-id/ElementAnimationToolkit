@@ -834,7 +834,7 @@ namespace instance.id.EATK
                 buttonContainerDictionary.ForEach(x =>
                 {
                     // -- Then query for each button within the row ------
-                    // -- Set default button cascase delay and counters --
+                    // -- Set default button cascade delay and counters --
                     var buttons = x.Value.Query<Button>().ToList();
                     var buttonCascade = 100;
                     var buttonCount = buttons.Count;

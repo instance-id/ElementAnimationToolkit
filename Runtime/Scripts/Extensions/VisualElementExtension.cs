@@ -619,16 +619,49 @@ namespace instance.id.EATK.Extensions
             return DoSetBorderColor;
         }
 
+        
+        // --------------------------------- Base Style Elements
+        /// <summary>
+        /// Set <see cref="Label"/> element text value 
+        /// </summary>
+        /// <param name="element">The element in which to set the text</param>
+        /// <param name="value">String value in which ot set the text</param>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        public static T SetText<T>(this T element, string value) where T : Label
+        {
+            element.text = value;
+            return element;
+        }
+        
+        public static T SetDisplay<T>(this T element, bool value) where T : VisualElement
+        {
+            element.style.display = value ? DisplayStyle.Flex : DisplayStyle.None;
+            return element;
+        }
+        
+        /// <summary>
+        /// Get element current display value
+        /// </summary>
+        /// <param name="element">The element in which to get display status</param>
+        /// <typeparam name="T">VisualElement</typeparam>
+        /// <returns>Bool value of element display status</returns>
+        public static bool GetDisplay<T>(this T element) where T : VisualElement
+        {
+            return element.resolvedStyle.display == DisplayStyle.Flex ;
+        }
+        
         /// <summary>
         /// Adds a border to all sides of the VisualElement
         /// </summary>
         /// <param name="element">The target element to add a border</param>
         /// <param name="opacity">The value in which to set the border thickness</param>
         /// <typeparam name="T">VisualElement</typeparam>
-        public static void SetOpacity<T>(this T element, float opacity = 0) where T : VisualElement
+        public static T SetOpacity<T>(this T element, float opacity = 0) where T : VisualElement
         {
             if (opacity == 0) opacity = opacity.Zero();
             element.style.opacity = opacity;
+            return element;
         }
 
         #endregion
