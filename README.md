@@ -60,6 +60,9 @@ This package began simply as a small collection of helpers methods I created acr
 ### Animations and Features
 
 ---
+
+(There are more, I just have not added them all yet) 
+ when chaining Anims
 | Animation types:   | Method                 |
 | ------------------ | ---------------------- |
 | Sequences:         |                        |
