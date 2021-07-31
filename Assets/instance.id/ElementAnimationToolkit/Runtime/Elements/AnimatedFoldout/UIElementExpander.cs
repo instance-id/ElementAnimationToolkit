@@ -42,13 +42,13 @@ namespace instance.id.EATK
 
         public Expander()
         {
-            expandToggle = new Toggle {style = {display = DisplayStyle.None}, name = "ExpandToggle"};
+            expandToggle = new Toggle { style = { display = DisplayStyle.None }, name = "ExpandToggle" };
             expandToggle.RegisterValueChangedCallback(ExpandContainerValueChanges);
 
             expandContainerItems = new VisualElement
             {
                 name = "expandContainer",
-                style = {overflow = Overflow.Hidden}
+                style = { overflow = Overflow.Hidden }
             };
             expandContainerItems.AddToClassList("expandContainer");
             expandContainerItems.Add(shownItem);
@@ -144,7 +144,7 @@ namespace instance.id.EATK
                     expandContainerItems.experimental.animation.Start(new StyleValues
                         {
                             height = expandContainerItems.layout.height
-                        }, new StyleValues {height = 0}, animationTime)
+                        }, new StyleValues { height = 0 }, animationTime)
                         .Ease(Easy.EaseInOutQuint)
                         .OnCompleted(HideContents);
                 foldoutAnimation.KeepAlive();
@@ -172,7 +172,7 @@ namespace instance.id.EATK
                 IsAnimating = true;
                 foldoutAnimation =
                     expandContainerItems.experimental.animation
-                        .Start(new StyleValues {height = expandContainerItems.layout.height}, new StyleValues {height = 0}, firstStart ? tmpAnimTime : m_AnimationTime)
+                        .Start(new StyleValues { height = expandContainerItems.layout.height }, new StyleValues { height = 0 }, firstStart ? tmpAnimTime : m_AnimationTime)
                         .Ease(Easy.EaseInOutQuint)
                         .OnCompleted(AnimationComplete);
                 foldoutAnimation.KeepAlive();
@@ -184,7 +184,7 @@ namespace instance.id.EATK
             IsAnimating = true;
             foldoutAnimation =
                 expandContainerItems.experimental.animation
-                    .Start(new StyleValues {height = evt.oldRect.height}, new StyleValues {height = evt.newRect.height}, firstStart ? tmpAnimTime : m_AnimationTime)
+                    .Start(new StyleValues { height = evt.oldRect.height }, new StyleValues { height = evt.newRect.height }, firstStart ? tmpAnimTime : m_AnimationTime)
                     .Ease(Easy.EaseInOutQuint)
                     .OnCompleted(AnimationComplete);
 

@@ -16,6 +16,10 @@ namespace instance.id.EATK
         private List<ValueAnimation<StyleValues>> animatedItemList;
         private ValueAnimation<StyleValues>[] animatedItemArray;
 
+        // -- Default to allowing the animation to run, but allows for manually   
+        // -- setting false to prevent animation from running until set back to true
+        private bool allowRun = true;
+
         // --------------------------------------------------- Constructor
         // ---------------------------------------------------------------
         public AnimatedItems(VisualElement ele)
@@ -51,6 +55,12 @@ namespace instance.id.EATK
         {
             get => animatedItemArray;
             set => animatedItemArray = value;
+        }
+        
+        public bool AllowRun
+        {
+            get => allowRun;
+            set => allowRun = value;
         }
     }
     

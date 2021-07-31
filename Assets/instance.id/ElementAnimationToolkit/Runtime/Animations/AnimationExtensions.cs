@@ -42,7 +42,7 @@ namespace instance.id.EATK
         /// <param name="includeChildren">Register child elements in addition to the target element</param>
         /// <typeparam name="TEventType">The event callback type in which to register</typeparam>
         /// <returns>The target element</returns>
-        public static VisualElement RegisterCallback<TEventType>(this VisualElement element, EventCallback<TEventType> callback, bool includeChildren)
+        public static VisualElement RegisterCallback<TEventType>(this VisualElement element, EventCallback<TEventType> callback, bool includeChildren, TrickleDown useTrickleDown = TrickleDown.NoTrickleDown)
             where TEventType : EventBase<TEventType>, new()
         {
             element.RegisterCallback(callback);
@@ -60,7 +60,7 @@ namespace instance.id.EATK
         /// <param name="includeChildren">Register child elements in addition to the target element</param>
         /// <typeparam name="TEventType">The event callback type in which to register</typeparam>
         /// <returns>The target element</returns>
-        public static void UnregisterCallback<TEventType>(this VisualElement element, EventCallback<TEventType> callback, bool includeChildren)
+        public static void UnregisterCallback<TEventType>(this VisualElement element, EventCallback<TEventType> callback, bool includeChildren, TrickleDown useTrickleDown = TrickleDown.NoTrickleDown)
             where TEventType : EventBase<TEventType>, new()
         {
             element.UnregisterCallback(callback);

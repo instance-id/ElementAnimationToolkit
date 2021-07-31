@@ -3,6 +3,7 @@
 // -- instance.id 2020 | http://github.com/instance-id | http://instance.id  --
 // ----------------------------------------------------------------------------
 #if UNITY_EDITOR
+using System;
 using instance.id.EATK.Extensions;
 using UnityEngine.UIElements;
 
@@ -20,6 +21,7 @@ namespace instance.id.EATK
         public Expander expander;
         private bool m_Value;
         private bool isAnimating;
+        public Action stateChange = () => {};
 
         /// <summary>
         ///   <para>USS class name of elements of this type.</para>
@@ -40,7 +42,10 @@ namespace instance.id.EATK
         ///   <para>USS class name of expander element in a AnimatedFoldout.</para>
         /// </summary>
         public static readonly string expanderUssClassName = ussClassName + "__expander";
-
+       
+        /// <summary>
+        /// The container element that holds the AnimatedFoldout's child objects
+        /// </summary>
         public override VisualElement contentContainer => m_Container;
 
         public string text
@@ -64,6 +69,7 @@ namespace instance.id.EATK
                     SetValueWithoutNotify(value);
                     SendEvent(pooled);
                 }
+                stateChange.Invoke();
             }
         }
 
@@ -93,7 +99,6 @@ namespace instance.id.EATK
             hierarchy.Add(expander);
             RegisterCallback(new EventCallback<AttachToPanelEvent>(OnAttachToPanel));
             RegisterCallback<GeometryChangedEvent>(DeferredExecution);
-            // expander.AnimationStatus += SetPickingMode;
         }
 
         private void DeferredExecution(GeometryChangedEvent evt)
@@ -109,6 +114,23 @@ namespace instance.id.EATK
         {
             m_Toggle.style.opacity = 1;
             m_Toggle.SetEnabled(!animating);
+        }
+
+        public void Expand(bool expandValue) => value = expandValue;
+        public void Expand() => value = !value;
+
+        /// <summary>
+        /// Manually trigger expansion or collapse of the expansion group via parameter
+        /// </summary>
+        /// <param name="rootElement">The root visual element of the binding object</param>
+        public void ActivateOnStart(VisualElement rootElement) => 
+            rootElement.RegisterCallback<GeometryChangedEvent>(evt => DoActivationOnStart(evt, rootElement));
+
+        // -- Callback will call this once the editor is ready, but just before displaying, so there is no visual "pop"
+        private void DoActivationOnStart(GeometryChangedEvent evt, VisualElement visualElement)
+        {
+            visualElement.UnregisterCallback<GeometryChangedEvent>(e => DoActivationOnStart(evt, visualElement));
+            value = true;
         }
 
         private void OnAttachToPanel(AttachToPanelEvent evt)

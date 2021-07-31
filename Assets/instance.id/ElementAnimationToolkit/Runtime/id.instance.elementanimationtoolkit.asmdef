@@ -1,8 +1,7 @@
 {
     "name": "id.instance.elementanimationtoolkit",
-    "references": [
-        "id.instance.extensions"
-    ],
+    "rootNamespace": "",
+    "references": [],
     "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": false,

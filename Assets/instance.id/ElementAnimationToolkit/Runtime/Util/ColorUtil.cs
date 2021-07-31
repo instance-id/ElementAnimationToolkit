@@ -25,7 +25,7 @@ namespace instance.id.EATK.Extensions
         /// <summary>
         /// Converts a hexadecimal color string to a Unity RGBA Color value
         /// </summary>
-        /// <example><code>var color = GetColor.FromHex("#CCCCCC");</code></example>
+        /// <example><code>var color = ColorUtil.FromHex("#CCCCCC");</code></example>
         /// <param name="color">The string parameter must be a hexadecimal string, can beginning with #</param>
         /// <returns>Returns a Unity Color parameter converted from a HTML/hexadecimal color string</returns>
         /// <remarks>The string parameter must be a hexadecimal string beginning with #</remarks>

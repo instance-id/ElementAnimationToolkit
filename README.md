@@ -1,29 +1,95 @@
 
 # ElementAnimationToolkit
 
-### A collection of Unity UIElements animation extension methods, new animated elements, and examples.
+### A collection of Unity UIToolkit/UIElements chainable animation extension methods, premade animated elements, and examples. <!-- omit in toc -->
 ![](media/intro_animation.gif)
 
-[Documentation] https://docs.instance.id/elementanimationtoolkit/
+<br>
 
-### Note: UIElements Animations are listed as Experimental by Unity - API subject to change. Also, since Element Animation Toolkit is currently underactive development, it is possible for API changes in this library as well 
+- [ElementAnimationToolkit](#elementanimationtoolkit)
+    - [Recent Features or Changes](#recent-features-or-changes)
+  - [Documentation](#documentation)
+    - [Installation](#installation)
+      - [Install via OpenUPM](#install-via-openupm)
+      - [Unity Package Manager](#unity-package-manager)
+    - [Animations and Features](#animations-and-features)
+    - [Usage / Examples](#usage--examples)
+      - [Background Color Fade-In](#background-color-fade-in)
+      - [Hover Border Pulse](#hover-border-pulse)
+      - [Fade-in sequence](#fade-in-sequence)
 
-#### The intent of this package is to help asset developers more easily create their own animation sequences via code.  
-Though, I have been adding some new "ready to go" UIElement types, such as the "AnimatedFoldout", which you just use as you would a a typical foldout comes animated with no additional coding, minus some exposed properties to adjust the animation to your liking. I do intend to add more of these as I go along. 
+<br>
+
+### Recent Features or Changes
+| New Animation types: |                       |
+| -------------------- | --------------------- |
+| Sequences            |                       |
+|                      | ShowForDuration       |
+| Base Annimations     |                       |
+|                      | AnimateOpacityDelayed |
+
+## [Documentation]("https://docs.instance.id/elementanimationtoolkit/")
+
+---
+
+### Note: UIElements Animations are listed as Experimental by Unity - API subject to change. Also, since Element Animation Toolkit is currently underactive development, it is possible for API changes in this library as well <!-- omit in toc -->
+
+<br>
+
+#### The intent of this package is to help asset developers more easily create their own animation sequences via code.<!-- omit in toc -->
+Though, I have been adding some new "ready to go" UIElement types, such as the "AnimatedFoldout", which you just use as you would a a typical foldout comes animated with no additional coding, minus some exposed properties to adjust the animation to your liking. I do intend to add more of these as I go along.
+
+<br>
 
 This package began simply as a small collection of helpers methods I created across my last few projects to make animating editor elements much easier and finally put into a single place. I continue to add to it as I go along but decided to put together several examples and wanted to share them.
 
-### Install via OpenUPM  
-openupm add id.instance.elementanimationtoolkit
+<br>
 
-### Unity Package Manager  
-https://github.com/instance-id/elementanimationtoolkit.git#upm
+### Installation
 
-### Usage:
+---
+
+#### [Install via OpenUPM](https://openupm.com/packages/id.instance.elementanimationtoolkit)
+```openupm add id.instance.elementanimationtoolkit```
+
+#### [Unity Package Manager](https://github.com/instance-id/ElementAnimationToolkit/tree/upm)
+```github.com/instance-id/elementanimationtoolkit.git#upm```
+
+<br>
+
+### Animations and Features
+
+---
+| Animation types:   | Method                 |
+| ------------------ | ---------------------- |
+| Sequences:         |                        |
+|                    | AnimCharacterSequence  |
+|                    | AnimFadeInSequence     |
+|                    | ShowForDuration        |
+| Base Annimations:  |                        |
+|                    | AnimateBackgroundColor |
+|                    | AnimateBorderColor     |
+|                    | AnimateColor           |
+|                    | AnimateImageTintColor  |
+|                    | AnimateOpacity         |
+|                    | AnimateOpacityDelayed  |
+|                    | AnimateWidth           |
+|                    | AnimateHeight          |
+| Extensions/Helpers |                        |
+|                    | AutoToggleAfter        |
+|                    | ApplyPrivacyMask       |
+|                    | SetDisplay             |
+|                    | GetDisplay             |
+|                    | SetOpacity             |
+|                    | GetDisplay             |
+|                    | SetText                |
+|                    | OpenURL                |
+
+### Usage / Examples:
 
 Examples: Tools > instance.id > Element Animation Toolkit
 
-Note: The code is pretty ~~heavily~~ excessively documented and currently most method summaries for extension methods have examples in them. Be sure to check the comments for additional details!  
+Note: The code is pretty ~~heavily~~ excessively documented and currently most method summaries for extension methods have examples in them. Be sure to check the comments for additional details!
 
 ![](https://i.imgur.com/hY3DGDA.png)
 
@@ -48,11 +114,11 @@ Note: The code is pretty ~~heavily~~ excessively documented and currently most m
 
 There are several fairly basic base animation helper methods which can easily be used on their own, but are also the basis of the more complex animation sequences:
 
-### Background Color Fade-In
-![](media/background_fade_example.gif)  
- (The initial fade from gray to blue)
+#### Background Color Fade-In
+![](media/background_fade_example.gif)
+(The initial fade from gray to blue)
 
-<details open>
+<details>
 <summary>Example animation base helper: AnimateBackgroundColor()</summary>
 Usage:
 
@@ -71,9 +137,9 @@ visualElement.AnimateBackgroundColor(originalColor, fadeColor, durationOfFade);
 
 ---
 
-### Hover Border Pulse
-![](media/hoverborderpulse_example.gif)  
-<details open>
+#### Hover Border Pulse
+![](media/hoverborderpulse_example.gif)
+<details>
 <summary>Example hover animation: HoverBorderPulse()</summary>
 
 Usage:
@@ -85,68 +151,14 @@ visualElement.HoverBorderPulse(pulseStartColor: GetColor.FromHex("#7F3B3A"), pul
 
 </details>
 
-<details open>
-<summary>Example: HoverBorderPulse() return: AnimatedItems class</summary>
-
-```c#
-private VisualElement ve1 = new VisualElement();
-private VisualElement ve2 = new VisualElement();
-private VisualElement ve3 = new VisualElement();
-private List<AnimatedItems<MouseOverEvent, MouseOutEvent>> animatedItems = new List<AnimatedItems<MouseOverEvent, MouseOutEvent>>();
-
-private void RegisterHoverEvents()
-{
-    // -- Register Hover animations ---------- 
-    // -- HoverBorderPulse returns an AnimatedItems class (this example returns AnimatedItems<MouseOverEvent, MouseOutEvent>)
-    // -- We add the returned AnimatedItems object to a List for each event registration
-    animatedItems.Add(
-        ve1.HoverBorderPulse(
-            "#2F569C".FromHex(),
-            "#D2A00C".FromHex(),
-            includeChildren: true
-        )
-    );
-
-    animatedItems.Add(
-        ve2.HoverBorderPulse(
-            "#2F569C".FromHex(),
-            "#D2A00C".FromHex(),
-            includeChildren: true
-        )
-    );
-
-    animatedItems.Add(
-        ve3.HoverBorderPulse(
-            "#2F569C".FromHex(),
-            "#D2A00C".FromHex(),
-            includeChildren: true
-        )
-    );
-}
-
-private void UnregisterHoverEvents()
-{
-    // -- We can iterate over the AnimatedItems list, as it contains the target VisualElement, the ValueAnimation properties used, 
-    // -- as well as the EventCallback used to register the event, which allows you to manually unregister it, should you need.
-    animatedItems.ForEach(v =>
-    {
-        v.Element.UnregisterCallback(v.EventCallbacks.mouseOverEvent);
-        v.Element.UnregisterCallback(v.EventCallbacks.mouseOutEvent);
-    });
-}
- 
-```
-
-</details>
-
 ---
 
-### Fade-in sequence
+#### Fade-in sequence
 ![](media/fade_example.gif)
 
-<details open>
+<details>
 <summary>Example complex animation sequence: AnimFadeInSequence()</summary>
- 
+
 Usage:
 
 ```c#
@@ -164,7 +176,7 @@ label.AnimFadeInSequence(newText, animatedTextColor, originalTextColor, fadeInTi
 
 </details>
 
-Then, of course, there is everything in between. 
+Then, of course, there is everything in between.
 
 Additionally there are many helper methods relating to many different Types from Color to opening weblinks in the browser.
 
@@ -172,7 +184,7 @@ Additionally there are many helper methods relating to many different Types from
 <summary>Example color helper method: GetColor.FromHex()</summary>
 
 Usage:
-```cs 
+```cs
 Color color = GetColor.FromHex("#CCCCCC");
 ```
 
@@ -193,7 +205,7 @@ public static Color FromHex(this string color)
 <summary>Example creating an external url link : OpenURL() </summary>
 
 Usage:
-```cs 
+```cs
 VisualElement visualElement = new VisualElement();
 visualElement.OpenURL("https://github.com/instance-id/ElementAnimationToolkit");
 ```
@@ -221,7 +233,7 @@ public static T OpenURL<T>(this T element, string url) where T : VisualElement
 Important files:
 
     Assets/instance.id/ElementAnimationToolkit/Editor/EATKEditor.cs
-This file is the primary example and demonstrative reference for most major features and is the main editor window of the package 
+This file is the primary example and demonstrative reference for most major features and is the main editor window of the package
 where you can view examples of several different types of animations and their usage.
 
 You can access the main editor window via Tools > instance.id > Element Animation Toolkit
@@ -232,13 +244,13 @@ There are three buttons per row, Editor, Anim, and USS.
 
 The editor button will take you directly to the editor code specific to that element where you will see the C# implementation of UIElements as well as most callback registrations.
 
-The Anim button takes you to another section of the file in which you can see the declaration, setup, and execution of any animation specific functions, 
+The Anim button takes you to another section of the file in which you can see the declaration, setup, and execution of any animation specific functions,
 
 Lastly is the USS button, which takes you to the USS stylesheet and the location of the particular animation if you need.
 
-The animations without a row of buttons have a right-click context menu implemented which has similar options to jump directly into 
-the code at the proper location for the animation. (The methods I have created for jumping straight to the proper lines of code 
-are of course included and you are welcome to take advantage of them for your own needs.)  
+The animations without a row of buttons have a right-click context menu implemented which has similar options to jump directly into
+the code at the proper location for the animation. (The methods I have created for jumping straight to the proper lines of code
+are of course included and you are welcome to take advantage of them for your own needs.)
 ![](media/jumptomenu.png)
 
 

@@ -1,4 +1,4 @@
-﻿// ----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 // -- Project : https://github.com/instance-id/ElementAnimationToolkit       --
 // -- instance.id 2020 | http://github.com/instance-id | http://instance.id  --
 // ----------------------------------------------------------------------------
@@ -7,13 +7,10 @@
 
 #if UNITY_EDITOR
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using instance.id.EATK.Extensions;
-// using instance.id.Extensions;
-// using instance.id.Extensions;
 using UnityEngine;
 using UnityEngine.UIElements;
+using System.Collections.Generic;
+using instance.id.EATK.Extensions;
 using UnityEngine.UIElements.Experimental;
 
 namespace instance.id.EATK
@@ -261,6 +258,40 @@ namespace instance.id.EATK
                 .Ease(easing)
                 .OnCompleted(callback);
         }
+
+        #endregion
+
+        // ----------------------------------------------- ShowForDuration
+        // --| ShowForDuration -------------------------------------------
+
+        #region ShowForDuration
+
+        /// <summary>
+        /// Show a hidden VisualElement by fading it's opacity for a specified duration and then hide it again when duration completes
+        /// </summary>
+        /// <param name="element">The element in which to display</param>
+        /// <param name="fadeDurationMs">The amount of time in milliseconds it should take to fade from one opacity extent to the other</param>
+        /// <param name="displayDurationMs">The amount of time in milliseconds to display the element before fading opacity back to 0</param>
+        /// <param name="callback">A callback to be executed upon completion of the animation sequence</param>
+        /// <param name="easing">The easing transition type to use for the animated values</param>
+        /// <returns>A list containing the ValueAnimation objects for each phase of the animation sequence</returns>
+        /// <remarks>Upon completion of the animation, the elements DisplayStyle will be set back to it's original value</remarks>
+        public static List<ValueAnimation<StyleValues>> ShowForDuration(this VisualElement element, int fadeDurationMs, int displayDurationMs, Action callback = null, Func<float, float> easing = null)
+        {
+            bool isDisplayed; // @formatter:off
+            List<ValueAnimation<StyleValues>> anims = new List<ValueAnimation<StyleValues>>(); 
+            if ((isDisplayed = element.GetDisplay()) == false) element.SetDisplay(true);
+            
+            anims.Add(element.SetOpacity(0.Zero()).AnimateOpacity(0.Zero(), 1, fadeDurationMs, () =>
+            {
+                anims.Add(element.AnimateOpacityDelayed(1, 0.Zero(), 500, displayDurationMs, () =>
+                {
+                   if (!isDisplayed) element.SetDisplay(false);
+                }));
+            }));
+            
+            return anims;
+        } // @formatter:on
 
         #endregion
     }
