@@ -8,7 +8,7 @@ jobs:
     name: copy-readme
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@master
+      - uses: actions/checkout@main
       - name: copy file
         uses: canastro/copy-file-action@master
         with:
