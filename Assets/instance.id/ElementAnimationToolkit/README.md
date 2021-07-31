@@ -2,18 +2,18 @@
 # ElementAnimationToolkit
 
 ### A collection of Unity UIToolkit/UIElements chainable animation extension methods, premade animated elements, and examples. <!-- omit in toc -->
-![](Documentation/media/intro_animation.gif)
+![](media/intro_animation.gif)
 
 <br>
 
 - [ElementAnimationToolkit](#elementanimationtoolkit)
-    - [Recent Features or Changes](#recent-features-or-changes)
+  - [Recent Features or Changes](#recent-features-or-changes)
   - [Documentation](#documentation)
     - [Installation](#installation)
       - [Install via OpenUPM](#install-via-openupm)
       - [Unity Package Manager](#unity-package-manager)
     - [Animations and Features](#animations-and-features)
-    - [Usage / Examples:](#usage--examples)
+    - [Usage / Examples](#usage--examples)
       - [Background Color Fade-In](#background-color-fade-in)
       - [Hover Border Pulse](#hover-border-pulse)
       - [Fade-in sequence](#fade-in-sequence)
@@ -60,6 +60,9 @@ This package began simply as a small collection of helpers methods I created acr
 ### Animations and Features
 
 ---
+
+(There are more, I just have not added them all yet)
+
 | Animation types:   | Method                 |
 | ------------------ | ---------------------- |
 | Sequences:         |                        |
@@ -119,7 +122,7 @@ Note: The code is pretty ~~heavily~~ excessively documented and currently most m
 There are several fairly basic base animation helper methods which can easily be used on their own, but are also the basis of the more complex animation sequences:
 
 #### Background Color Fade-In
-![](Documentation/media/background_fade_example.gif)
+![](media/background_fade_example.gif)
 (The initial fade from gray to blue)
 
 <details>
@@ -142,7 +145,7 @@ visualElement.AnimateBackgroundColor(originalColor, fadeColor, durationOfFade);
 ---
 
 #### Hover Border Pulse
-![](Documentation/media/hoverborderpulse_example.gif)
+![](media/hoverborderpulse_example.gif)
 <details>
 <summary>Example hover animation: HoverBorderPulse()</summary>
 
@@ -158,7 +161,7 @@ visualElement.HoverBorderPulse(pulseStartColor: GetColor.FromHex("#7F3B3A"), pul
 ---
 
 #### Fade-in sequence
-![](Documentation/media/fade_example.gif)
+![](media/fade_example.gif)
 
 <details>
 <summary>Example complex animation sequence: AnimFadeInSequence()</summary>
@@ -244,7 +247,7 @@ You can access the main editor window via Tools > instance.id > Element Animatio
 
 There are three buttons per row, Editor, Anim, and USS.
 
-![](Documentation/media/rowbuttons.png)
+![](media/rowbuttons.png)
 
 The editor button will take you directly to the editor code specific to that element where you will see the C# implementation of UIElements as well as most callback registrations.
 
@@ -255,7 +258,7 @@ Lastly is the USS button, which takes you to the USS stylesheet and the location
 The animations without a row of buttons have a right-click context menu implemented which has similar options to jump directly into
 the code at the proper location for the animation. (The methods I have created for jumping straight to the proper lines of code
 are of course included and you are welcome to take advantage of them for your own needs.)
-![](Documentation/media/jumptomenu.png)
+![](media/jumptomenu.png)
 
 
 ---
