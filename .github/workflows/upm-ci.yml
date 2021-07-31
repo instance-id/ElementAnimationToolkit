@@ -4,6 +4,17 @@ on:
     branches:
     - main
 jobs:
+  copy-readme:
+    name: copy-readme
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master
+      - name: copy file
+        uses: canastro/copy-file-action@master
+        with:
+          source: "README.md"
+          target: "Assets/instance.id/ElementAnimationToolkit/README.md"
+          
   split-upm:
     name: split upm branch
     runs-on: ubuntu-latest

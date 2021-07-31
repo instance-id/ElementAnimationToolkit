@@ -62,13 +62,17 @@ This package began simply as a small collection of helpers methods I created acr
 ---
 
 (There are more, I just have not added them all yet) 
- when chaining Anims
+
 | Animation types:   | Method                 |
 | ------------------ | ---------------------- |
 | Sequences:         |                        |
 |                    | AnimCharacterSequence  |
 |                    | AnimFadeInSequence     |
 |                    | ShowForDuration        |
+| Continuous:        |                        |
+|                    | AnimBorderPulse        |
+| Hover:             |                        |
+|                    | HoverBorderPulse       |
 | Base Annimations:  |                        |
 |                    | AnimateBackgroundColor |
 |                    | AnimateBorderColor     |
