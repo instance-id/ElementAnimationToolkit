@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using instance.id.EATK.Extensions;
 using JetBrains.Annotations;
 using UnityEngine;
 using UnityEngine.UIElements;
- #if UNITY_EDITOR
+using instance.id.EATK.Extensions;
+
+#if UNITY_EDITOR
 namespace instance.id.EATK
 {
     // Hopefully these features will eventually be in the default TextField.
@@ -57,7 +58,7 @@ namespace instance.id.EATK
 
             maskedText = new TextField
             {
-                style = {display = DisplayStyle.Flex, position = Position.Absolute, unityFont = monoFont},
+                style = { display = DisplayStyle.Flex, position = Position.Absolute, unityFont = monoFont },
                 value = "",
                 pickingMode = PickingMode.Ignore,
             };
@@ -77,7 +78,7 @@ namespace instance.id.EATK
             });
 
             // Add and configure placeholder
-            m_PlaceholderLabel = new Label {pickingMode = PickingMode.Ignore};
+            m_PlaceholderLabel = new Label { pickingMode = PickingMode.Ignore };
             m_PlaceholderLabel.AddToClassList(PlaceholderUssClassName);
             maskedText.Add(m_PlaceholderLabel);
 
@@ -189,18 +190,16 @@ namespace instance.id.EATK
         }
 
         [UsedImplicitly]
-        public new class UxmlFactory : UxmlFactory<MaskedInputField, UxmlTraits>
-        {
-        }
+        public new class UxmlFactory : UxmlFactory<MaskedInputField, UxmlTraits> { }
 
         public new class UxmlTraits : TextField.UxmlTraits
         {
-            readonly UxmlStringAttributeDescription m_Hint = new UxmlStringAttributeDescription {name = "placeholder"};
+            readonly UxmlStringAttributeDescription m_Hint = new UxmlStringAttributeDescription { name = "placeholder" };
 
             public override void Init(VisualElement ve, IUxmlAttributes bag, CreationContext cc)
             {
                 base.Init(ve, bag, cc);
-                var field = (MaskedInputField) ve;
+                var field = (MaskedInputField)ve;
                 field.Placeholder = m_Hint.GetValueFromBag(bag, cc);
             }
         }

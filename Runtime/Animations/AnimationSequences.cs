@@ -10,8 +10,8 @@ using System;
 using UnityEngine;
 using UnityEngine.UIElements;
 using System.Collections.Generic;
-using instance.id.EATK.Extensions;
 using UnityEngine.UIElements.Experimental;
+using instance.id.EATK.Extensions;
 
 namespace instance.id.EATK
 {

@@ -5,10 +5,10 @@
 
 #if UNITY_EDITOR
 using System;
-using instance.id.EATK.Extensions;
 using UnityEngine;
 using UnityEngine.UIElements;
 using UnityEngine.UIElements.Experimental;
+using instance.id.EATK.Extensions;
 
 namespace instance.id.EATK
 {

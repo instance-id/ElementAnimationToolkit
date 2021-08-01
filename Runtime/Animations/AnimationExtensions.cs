@@ -19,7 +19,7 @@ namespace instance.id.EATK
         /// <param name="delayMs">The amount of time in milliseconds that should be waited until the action begins</param>
         public static void ExecuteIn(this VisualElement element, Action action, long delayMs = 0)
         {
-            element.schedule.Execute(action).StartingIn(delayMs);
+            element.parent.schedule.Execute(action).StartingIn(delayMs);
         }
 
         /// <summary>
@@ -30,43 +30,7 @@ namespace instance.id.EATK
         /// <param name="delayMs">The amount of time in milliseconds that should be waited until the action begins</param>
         public static void ExecuteIn(this Action action, VisualElement element, long delayMs = 0)
         {
-            element.schedule.Execute(action).StartingIn(delayMs);
-        }
-
-        // -- Register Callback with element return ------------
-        /// <summary>
-        /// RegisterCallback on element, as well as children, and return the element
-        /// </summary>
-        /// <param name="element">The target element in which to register the callback</param>
-        /// <param name="callback">The callback in which to register</param>
-        /// <param name="includeChildren">Register child elements in addition to the target element</param>
-        /// <typeparam name="TEventType">The event callback type in which to register</typeparam>
-        /// <returns>The target element</returns>
-        public static VisualElement RegisterCallback<TEventType>(this VisualElement element, EventCallback<TEventType> callback, bool includeChildren, TrickleDown useTrickleDown = TrickleDown.NoTrickleDown)
-            where TEventType : EventBase<TEventType>, new()
-        {
-            element.RegisterCallback(callback);
-            if (!includeChildren) return element;
-            var children = element.Query<VisualElement>().Descendents<VisualElement>().ToList();
-            children.ForEach(x => x.RegisterCallback(callback));
-            return element;
-        }
-        
-        /// <summary>
-        /// RegisterCallback on element, as well as children, and return the element
-        /// </summary>
-        /// <param name="element">The target element in which to register the callback</param>
-        /// <param name="callback">The callback in which to register</param>
-        /// <param name="includeChildren">Register child elements in addition to the target element</param>
-        /// <typeparam name="TEventType">The event callback type in which to register</typeparam>
-        /// <returns>The target element</returns>
-        public static void UnregisterCallback<TEventType>(this VisualElement element, EventCallback<TEventType> callback, bool includeChildren, TrickleDown useTrickleDown = TrickleDown.NoTrickleDown)
-            where TEventType : EventBase<TEventType>, new()
-        {
-            element.UnregisterCallback(callback);
-            if (!includeChildren) return;
-            var children = element.Query<VisualElement>().Descendents<VisualElement>().ToList();
-            children.ForEach(x => x.UnregisterCallback(callback));
+            element.parent.schedule.Execute(action).StartingIn(delayMs);
         }
     }
 }
