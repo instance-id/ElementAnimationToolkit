@@ -8,11 +8,8 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.UIElements;
-
-
 using UnityEditor;
 using UnityEditor.UIElements;
-
 
 namespace instance.id.EATK.Extensions
 {
@@ -115,7 +112,7 @@ namespace instance.id.EATK.Extensions
         /// <param name="name">If a name is specifically passed as a parameter, it will be used, otherwise the target variable name is used</param>
         /// <param name="containerType">Whether this element should be a row or column</param>
         /// <typeparam name="T">VisualElement</typeparam>
-        public static VisualElement CreateWithLabel<T>(this T element, out VisualElement variable, string name = null, ContainerType containerType = ContainerType.Row, string labelText = default) where T : VisualElement
+        public static VisualElement CreateWithLabel<T>(this T element, out VisualElement variable, string name = null, ContainerType containerType = ContainerType.Row, string labelText = default, float labelMinWidth = default) where T : VisualElement
         {
             StyleEnum<FlexDirection> direction = containerType == ContainerType.Row
                 ? new StyleEnum<FlexDirection>(FlexDirection.Row)
@@ -124,7 +121,29 @@ namespace instance.id.EATK.Extensions
             if (name != null) element.name = name;
 
             new VisualElement { style = { flexDirection = direction } }.Create(out var elementContainer).ToUSS($"{element.name}Container", (containerType == ContainerType.Row ? "containerRow" : "containerColumn"), labelText);
-            new Label { text = labelText }.Create().ToUSS($"{element.name}Label").SetParent(elementContainer);
+            if (labelMinWidth != default) new Label { text = labelText, style = { minWidth = labelMinWidth } }.Create().ToUSS($"{element.name}Label").SetParent(elementContainer);
+            else new Label { text = labelText }.Create().ToUSS($"{element.name}Label").SetParent(elementContainer);
+
+            element.SetParent(elementContainer);
+            return variable = elementContainer;
+        }
+        
+        public static VisualElement CreateWithLabel<T, TE>(this T element, out VisualElement variable, string name = null, ContainerType containerType = ContainerType.Row, string labelText = default, float labelMinWidth = default, EventCallback<ChangeEvent<TE>> onValueChanged = null)
+            where T : VisualElement
+            where TE : struct
+        {
+            StyleEnum<FlexDirection> direction = containerType == ContainerType.Row
+                ? new StyleEnum<FlexDirection>(FlexDirection.Row)
+                : new StyleEnum<FlexDirection>(FlexDirection.Column);
+
+            if (name != null) element.name = name;
+
+            new VisualElement { style = { flexDirection = direction } }.Create(out var elementContainer).ToUSS($"{element.name}Container", (containerType == ContainerType.Row ? "containerRow" : "containerColumn"), labelText);
+            if (labelMinWidth != default) new Label { text = labelText, style = { minWidth = labelMinWidth } }.Create().ToUSS($"{element.name}Label").SetParent(elementContainer);
+            else new Label { text = labelText }.Create().ToUSS($"{element.name}Label").SetParent(elementContainer);
+
+            if (onValueChanged != null) 
+                element.RegisterCallback(onValueChanged);
 
             element.SetParent(elementContainer);
             return variable = elementContainer;
@@ -526,7 +545,7 @@ namespace instance.id.EATK.Extensions
 
         // ------------------------------------------------ Set Values
         /// <summary>
-        /// Set primary the color of the element
+        /// Set the primary color of the element
         /// </summary>
         /// <param name="element">The target element to apply color</param>
         /// <param name="color">The color to apply to the primary element</param>
@@ -538,7 +557,7 @@ namespace instance.id.EATK.Extensions
         }
 
         /// <summary>
-        /// Set background the color of the element
+        /// Set the background color of the element
         /// </summary>
         /// <param name="element">The target element to apply background color</param>
         /// <param name="color">The color to apply to the border</param>
@@ -548,7 +567,19 @@ namespace instance.id.EATK.Extensions
             if (element.style.backgroundColor != color) element.style.backgroundColor = color;
             return true;
         }
-
+        
+        /// <summary>
+        /// Set the image tint color of the element
+        /// </summary>
+        /// <param name="element">The target element to apply background color</param>
+        /// <param name="color">The color to apply to the border</param>
+        /// <typeparam name="T">VisualElement</typeparam>
+        public static bool SetBackgroundImageColor<T>(this T element, Color color = default) where T : VisualElement
+        {
+            if (element.style.unityBackgroundImageTintColor != color) element.style.unityBackgroundImageTintColor = color;
+            return true;
+        }
+ 
         /// <summary>
         /// Adds a border to all sides of the VisualElement
         /// </summary>
@@ -637,6 +668,32 @@ namespace instance.id.EATK.Extensions
         public static T SetDisplay<T>(this T element, bool value) where T : VisualElement
         {
             element.style.display = value ? DisplayStyle.Flex : DisplayStyle.None;
+            return element;
+        }
+        
+        /// <summary>
+        /// Set elements item alignment
+        /// </summary>
+        /// <param name="element">The Element in which to set alignment</param>
+        /// <param name="alignment">The <see cref="Align"/> value in which to set</param>
+        /// <typeparam name="T"><see cref="VisualElement"/></typeparam>
+        /// <returns>Returns the original element to allow method chaining</returns>
+        public static T SetAlignItems<T>(this T element, Align alignment) where T : VisualElement
+        {
+            element.style.alignItems = alignment;
+            return element;
+        }
+        
+        /// <summary>
+        /// Set elements content justification
+        /// </summary>
+        /// <param name="element">The Element in which to set alignment</param>
+        /// <param name="justify">The <see cref="Justify"/> value in which to set</param>
+        /// <typeparam name="T"><see cref="VisualElement"/></typeparam>
+        /// <returns>Returns the original element to allow method chaining</returns>
+        public static T SetJustify<T>(this T element, Justify justify) where T : VisualElement
+        {
+            element.style.justifyContent = justify;
             return element;
         }
         

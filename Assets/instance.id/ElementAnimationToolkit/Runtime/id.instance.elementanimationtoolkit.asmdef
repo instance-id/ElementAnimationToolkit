@@ -9,6 +9,12 @@
     "precompiledReferences": [],
     "autoReferenced": true,
     "defineConstraints": [],
-    "versionDefines": [],
+    "versionDefines": [
+        {
+            "name": "id.instance.extensions",
+            "expression": "",
+            "define": "USING_IDEXTENSIONS"
+        }
+    ],
     "noEngineReferences": false
 }

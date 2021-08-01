@@ -1,4 +1,5 @@
 {
     "com.unity.performance-tracking": "http://github.com/Unity-Technologies/com.unity.performance-tracking.git",
     "com.id.instance.hierarchyheader": "file:E:/GitHub/instance-id/HierarchyHeader/Assets/instance.id/HierarchyHeader",
+    "com.ms.litjson":"https://github.com/wlgys8/LitJsonUPM.git",
 }

@@ -5,16 +5,19 @@
 // -- Note: EATK is still currently being developed - API subject to change  --
 // ----------------------------------------------------------------------------
 
+#if UNITY_EDITOR
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using instance.id.EATK.Extensions;
+
 using JetBrains.Annotations;
 using UnityEditor;
 using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
 using UnityEngine.UIElements.Experimental;
+using instance.id.EATK.Extensions;
 
 namespace instance.id.EATK
 {
@@ -1256,3 +1259,4 @@ namespace instance.id.EATK
         }
     }
 }
+#endif

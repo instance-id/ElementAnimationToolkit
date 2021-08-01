@@ -9,9 +9,8 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
 using VisualElement = UnityEngine.UIElements.VisualElement;
-
 #if UNITY_EDITOR
-
+ 
 namespace instance.id.EATK.Extensions
 {
     // ReSharper disable once InconsistentNaming

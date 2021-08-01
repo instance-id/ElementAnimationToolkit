@@ -4,12 +4,11 @@
 // ----------------------------------------------------------------------------
 
 #if UNITY_EDITOR
-
-
 using System;
-using instance.id.EATK.Extensions;
 using UnityEngine;
 using UnityEngine.UIElements;
+using instance.id.EATK.Extensions;
+
 // ReSharper disable UnusedMember.Global
 #pragma warning disable 108,114
 
@@ -56,7 +55,7 @@ namespace instance.id.EATK
         {
             editorType = GetType();
             styleSheets.Add(StylesheetSetup());
-            new Label {text = ""}.Create(out animatedLabel).ToUSS(nameof(animatedLabel));
+            new Label { text = "" }.Create(out animatedLabel).ToUSS(nameof(animatedLabel));
             animatedLabel.AddToClassList(ussClassNameExtended);
             Add(animatedLabel);
 
@@ -76,9 +75,7 @@ namespace instance.id.EATK
         //
         // }
 
-        public void Play()
-        {
-        }
+        public void Play() { }
 
         private StyleSheet StylesheetSetup()
         {
@@ -139,33 +136,33 @@ namespace instance.id.EATK
         }
 
         public void RegisterCallback<TEventType, TUserArgsType>(
-            EventCallback<TEventType, TUserArgsType> callback,
-            TUserArgsType userArgs,
-            TrickleDown useTrickleDown = TrickleDown.NoTrickleDown)
+        EventCallback<TEventType, TUserArgsType> callback,
+        TUserArgsType userArgs,
+        TrickleDown useTrickleDown = TrickleDown.NoTrickleDown)
             where TEventType : EventBase<TEventType>, new()
         {
             animatedLabel.RegisterCallback<TEventType, TUserArgsType>(callback, userArgs, useTrickleDown);
         }
 
         public void UnregisterCallback<TEventType>(
-            EventCallback<TEventType> callback,
-            TrickleDown useTrickleDown = TrickleDown.NoTrickleDown)
+        EventCallback<TEventType> callback,
+        TrickleDown useTrickleDown = TrickleDown.NoTrickleDown)
             where TEventType : EventBase<TEventType>, new()
         {
             animatedLabel.UnregisterCallback<TEventType>(callback, useTrickleDown);
         }
 
         public void UnregisterCallback<TEventType, TUserArgsType>(
-            EventCallback<TEventType, TUserArgsType> callback,
-            TrickleDown useTrickleDown = TrickleDown.NoTrickleDown)
+        EventCallback<TEventType, TUserArgsType> callback,
+        TrickleDown useTrickleDown = TrickleDown.NoTrickleDown)
             where TEventType : EventBase<TEventType>, new()
         {
             animatedLabel.UnregisterCallback<TEventType, TUserArgsType>(callback, useTrickleDown);
         }
 
         public static bool RegisterValueChangedCallback<T>(
-              INotifyValueChanged<T> control,
-            EventCallback<ChangeEvent<T>> callback)
+        INotifyValueChanged<T> control,
+        EventCallback<ChangeEvent<T>> callback)
         {
             if (!(control is CallbackEventHandler callbackEventHandler))
                 return false;
@@ -174,8 +171,8 @@ namespace instance.id.EATK
         }
 
         public static bool UnregisterValueChangedCallback<T>(
-               INotifyValueChanged<T> control,
-            EventCallback<ChangeEvent<T>> callback)
+        INotifyValueChanged<T> control,
+        EventCallback<ChangeEvent<T>> callback)
         {
             if (!(control is CallbackEventHandler callbackEventHandler))
                 return false;
@@ -188,16 +185,12 @@ namespace instance.id.EATK
         /// <summary>
         /// Instantiates a <see cref="AnimatedLabel"/> using the data read from a UXML file.
         /// </summary>
-        public new class UxmlFactory : UxmlFactory<AnimatedLabel, UxmlTraits>
-        {
-        }
+        public new class UxmlFactory : UxmlFactory<AnimatedLabel, UxmlTraits> { }
 
         /// <summary>
         /// Defines <see cref="UxmlTraits"/> for the <see cref="AnimatedLabel"/>.
         /// </summary>
-        public new class UxmlTraits : TextElement.UxmlTraits
-        {
-        }
+        public new class UxmlTraits : TextElement.UxmlTraits { }
     }
 }
 #endif

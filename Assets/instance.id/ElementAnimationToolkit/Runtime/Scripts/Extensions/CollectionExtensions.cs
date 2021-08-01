@@ -3,16 +3,16 @@ using System.Collections.Generic;
 using System.Linq;
 using Object = UnityEngine.Object;
 
-namespace instance.id.EATK.Extensions
+namespace instance.id.EATK
 {
-    public static class CollectionExtensions
+    public static class CollectionExtension
     {
         // ------------------------------------------------------------------- Dictionary Functions
         // -- Dictionary Functions ----------------------------------------------------------------
 
         #region Dictionary
 
-        public static Tvalue TryGet<Tkey, Tvalue>(this Dictionary<Tkey, Tvalue> dict, Tkey key)
+        public static Tvalue TryGetVal<Tkey, Tvalue>(this Dictionary<Tkey, Tvalue> dict, Tkey key)
         {
             dict.TryGetValue(key, out var value);
             return value;
@@ -29,7 +29,7 @@ namespace instance.id.EATK.Extensions
             dictionary.Add(key, result);
             return result;
         }
-        
+
         public static bool TryAddValue<TKey, TValue>(this IDictionary<TKey, TValue> dictionary, TKey key, TValue value)
         {
             if (!dictionary.ContainsKey(key))
@@ -143,7 +143,7 @@ namespace instance.id.EATK.Extensions
 
         // ------------------------------------------------------------------------- List Functions
         // -- List Functions ----------------------------------------------------------------------
-
+        
         #region List
 
         public static bool TryAddValue<TValue>(this List<TValue> list, TValue value)
@@ -197,7 +197,7 @@ namespace instance.id.EATK.Extensions
 
             return forEach;
         }
-        
+
         public static void ForEach<T>(this IEnumerable<T> ie, Action<T> action)
         {
             foreach (var i in ie)
@@ -217,7 +217,5 @@ namespace instance.id.EATK.Extensions
         }
 
         #endregion
-
-
     }
 }

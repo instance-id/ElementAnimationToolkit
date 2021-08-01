@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using instance.id.EATK.Examples;
 using instance.id.EATK.Extensions;
 using JetBrains.Annotations;
 using UnityEditor;
@@ -8,7 +9,7 @@ using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-namespace instance.id.EATK.Examples
+namespace instance.id.EATK.Extensions
 {
     [CustomEditor(typeof(ExampleComponent))]
     public class ExampleComponentEditor : Editor
@@ -220,21 +221,22 @@ namespace instance.id.EATK.Examples
             root.schedule.Execute(() => charVitalsLabel.AnimateColor(default, "#ff8000".FromHex(), 1000, Second)).StartingIn(600);
             root.schedule.Execute(() => charDetailLabel.AnimateColor(default, "#ff8000".FromHex(), 1000, First)).StartingIn(900);
 
-            void DoLabels()
-            {
-                var cascade = 100;
-                labelData.ForEach(l =>
-                {
-                    l.schedule.Execute(() =>
-                    {
-                        l.AnimCharacterSequence(
-                            "#BABABA".FromHex(),
-                            "#2F569C".FromHex(),
-                            50,
-                            150);
-                    }).StartingIn(cascade += 300);
-                });
-            }
+      
+            // void DoLabels()
+            // {
+            //     var cascade = 100;
+            //     labelData.ForEach(l =>
+            //     {
+            //         l.schedule.Execute(() =>
+            //         {
+            //             l.AnimCharacterSequence(
+            //                 "#BABABA".FromHex(),
+            //                 "#2F569C".FromHex(),
+            //                 50,
+            //                 150);
+            //         }).StartingIn(cascade += 300);
+            //     });
+            // }
         }
 
         private VisualElement headerContainer;
@@ -242,9 +244,9 @@ namespace instance.id.EATK.Examples
         private IVisualElementScheduledItem headerHighlighter;
         private IVisualElementScheduledItem containerHighlighter;
 
-        int color1Duration = 500;
-        int color2Duration = 500;
-        int durationBuffer = 20;
+        private int color1Duration = 500;
+        private  int color2Duration = 500;
+        // private int durationBuffer = 20;
 
         private void SetupHighlighter()
         {
