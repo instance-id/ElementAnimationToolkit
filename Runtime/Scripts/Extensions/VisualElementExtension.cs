@@ -2,14 +2,20 @@
 // -- Project : https://github.com/instance-id/Extensions                    --
 // -- instance.id 2020 | http://github.com/instance-id | http://instance.id  --
 // ----------------------------------------------------------------------------
+
 #if UNITY_EDITOR
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 using UnityEngine;
 using UnityEngine.UIElements;
 using UnityEditor;
 using UnityEditor.UIElements;
+using Quaternion = UnityEngine.Quaternion;
+using Vector2 = UnityEngine.Vector2;
+using Vector3 = UnityEngine.Vector3;
+using Vector4 = UnityEngine.Vector4;
 
 namespace instance.id.EATK.Extensions
 {
@@ -127,7 +133,7 @@ namespace instance.id.EATK.Extensions
             element.SetParent(elementContainer);
             return variable = elementContainer;
         }
-        
+
         public static VisualElement CreateWithLabel<T, TE>(this T element, out VisualElement variable, string name = null, ContainerType containerType = ContainerType.Row, string labelText = default, float labelMinWidth = default, EventCallback<ChangeEvent<TE>> onValueChanged = null)
             where T : VisualElement
             where TE : struct
@@ -142,13 +148,13 @@ namespace instance.id.EATK.Extensions
             if (labelMinWidth != default) new Label { text = labelText, style = { minWidth = labelMinWidth } }.Create().ToUSS($"{element.name}Label").SetParent(elementContainer);
             else new Label { text = labelText }.Create().ToUSS($"{element.name}Label").SetParent(elementContainer);
 
-            if (onValueChanged != null) 
+            if (onValueChanged != null)
                 element.RegisterCallback(onValueChanged);
 
             element.SetParent(elementContainer);
             return variable = elementContainer;
         }
-
+        
         /// <summary>
         /// Is elementName is passed, sets the target elements name and USS class to elementName.
         /// If no parameter is passed, the element USS class is set to the targets current name.
@@ -194,7 +200,13 @@ namespace instance.id.EATK.Extensions
             ((VisualElement)element).RegisterCallback(changeEvent);
             return element;
         }
-
+        
+        public static T RegisterValueChangeCallback<T, E>(this T element, EventCallback<E> changeEvent) where T : VisualElement where E : EventBase<E>, new()
+        {
+            ((VisualElement)element).RegisterCallback(changeEvent);
+            return element;
+        }
+ 
         /// <summary>
         /// Convert an object to another type
         /// </summary>
@@ -567,7 +579,7 @@ namespace instance.id.EATK.Extensions
             if (element.style.backgroundColor != color) element.style.backgroundColor = color;
             return true;
         }
-        
+
         /// <summary>
         /// Set the image tint color of the element
         /// </summary>
@@ -579,7 +591,7 @@ namespace instance.id.EATK.Extensions
             if (element.style.unityBackgroundImageTintColor != color) element.style.unityBackgroundImageTintColor = color;
             return true;
         }
- 
+
         /// <summary>
         /// Adds a border to all sides of the VisualElement
         /// </summary>
@@ -650,7 +662,7 @@ namespace instance.id.EATK.Extensions
             return DoSetBorderColor;
         }
 
-        
+
         // --------------------------------- Base Style Elements
         /// <summary>
         /// Set <see cref="Label"/> element text value 
@@ -664,13 +676,13 @@ namespace instance.id.EATK.Extensions
             element.text = value;
             return element;
         }
-        
+
         public static T SetDisplay<T>(this T element, bool value) where T : VisualElement
         {
             element.style.display = value ? DisplayStyle.Flex : DisplayStyle.None;
             return element;
         }
-        
+
         /// <summary>
         /// Set elements item alignment
         /// </summary>
@@ -683,7 +695,7 @@ namespace instance.id.EATK.Extensions
             element.style.alignItems = alignment;
             return element;
         }
-        
+
         /// <summary>
         /// Set elements content justification
         /// </summary>
@@ -696,7 +708,7 @@ namespace instance.id.EATK.Extensions
             element.style.justifyContent = justify;
             return element;
         }
-        
+
         /// <summary>
         /// Get element current display value
         /// </summary>
@@ -705,9 +717,9 @@ namespace instance.id.EATK.Extensions
         /// <returns>Bool value of element display status</returns>
         public static bool GetDisplay<T>(this T element) where T : VisualElement
         {
-            return element.resolvedStyle.display == DisplayStyle.Flex ;
+            return element.resolvedStyle.display == DisplayStyle.Flex;
         }
-        
+
         /// <summary>
         /// Adds a border to all sides of the VisualElement
         /// </summary>
