@@ -18,32 +18,44 @@ namespace instance.id.EATK
 
         // -------------------------------------------------- @HoverBorder
         // ---------------------------------------------------------------
-        /// <summary>
-        /// Pulse the  border of an element  between two colors
-        ///
-        /// ** To help combat your element shifting position slightly when a border is applied on hover,
-        /// it is a good idea to add a border to your element before hand and just set color to 'initial'
-        /// so that it is transparent, then keep 'addBorder' parameter as false.
-        /// </summary>
-        /// <param name="element">The element in which this function will be applied</param>
-        /// <param name="color1">Color 1 in which to pulse between</param>
-        /// <param name="color2">Color 2 in which to pulse between</param>
-        /// <param name="original">The original color of the element being changed. Can be obtained and passed via 'visualElement.style.backgroundColor.value'</param>
-        /// <param name="color1DurationMs">The amount of time it takes in milliseconds to complete the first color animation</param>
-        /// <param name="color2DurationMs">The amount of time it takes in milliseconds to complete the second color animation</param>
-        /// <param name="addBorder">Adds a border if the element does not have one already</param>
-        /// <param name="borderStartEndWidth">The width in which the borders should be when displaying</param>
-        /// <param name="callback">Function that can be called when the animation is completed</param>
-        /// <param name="borderSelection">The parameters of the Vector4(1-4) represent which borders should have their colors changed: 1(x) = left, 2(y) = top, 3(z) = right, 4(w) = bottom.
-        /// If only the top and bottom borders are desired to pulse, you would pass new Vector4(0, 1, 0, 1)</param>
-        public static IVisualElementScheduledItem AnimBorderPulse(this VisualElement element, Color color1, Color color2, Color original = default,
+        ///  <summary>
+        ///  Pulse the  border of an element  between two colors
+        /// 
+        ///  ** To help combat your element shifting position slightly when a border is applied on hover,
+        ///  it is a good idea to add a border to your element before hand and just set color to 'initial'
+        ///  so that it is transparent, then keep 'addBorder' parameter as false.
+        ///  </summary>
+        ///  <example>
+        /// <code>
+        ///  "#2F569C".FromHex(), "#D2A00C".FromHex()
+        ///  </code>
+        ///  </example>
+        ///  <param name="element">The element in which this function will be applied</param>
+        ///  <param name="color1">Color 1 in which to pulse between</param>
+        ///  <param name="color2">Color 2 in which to pulse between</param>
+        ///  <param name="original">The original color of the element being changed. Can be obtained and passed via 'visualElement.style.backgroundColor.value'</param>
+        ///  <param name="color1DurationMs">The amount of time it takes in milliseconds to complete the first color animation</param>
+        ///  <param name="color2DurationMs">The amount of time it takes in milliseconds to complete the second color animation</param>
+        ///  <param name="addBorder">Adds a border if the element does not have one already</param>
+        ///  <param name="borderStartEndWidth">The width in which the borders should be when displaying</param>
+        ///  <param name="callback">Function that can be called when the animation is completed</param>
+        ///  <param name="borderSelection">The parameters of the Vector4(1-4) represent which borders should have their colors changed: 1(x) = left, 2(y) = top, 3(z) = right, 4(w) = bottom.
+        ///  If only the top and bottom borders are desired to pulse, you would pass new Vector4(0, 1, 0, 1)</param>
+        ///  <param name="repeatedAnim">Pass in a new ScheduledItem object, which will return the animation in order to control it externally</param>
+        ///  <param name="delayBetween">Time in which to delay between each pulse set</param>
+        public static IVisualElementScheduledItem AnimBorderPulse(
+        this VisualElement element,
+        Color color1,
+        Color color2,
+        Color original = default,
         int color1DurationMs = 1000,
         int color2DurationMs = 1000,
         bool addBorder = false,
         Vector2 borderStartEndWidth = default,
         Action callback = null,
         Vector4 borderSelection = default,
-        IVisualElementScheduledItem repeatedAnim = default
+        IVisualElementScheduledItem repeatedAnim = default,
+        int delayBetween = 0
         )
         {
             if (borderStartEndWidth == default)
@@ -148,7 +160,7 @@ namespace instance.id.EATK
             // -- via the AnimateTo local function. Once completed  --
             // -- the AnimateFrom function is called animating back --
             // -- to the original color. This is then repeated for  --
-            // -- as long as the mouse is hovered over the target   --
+            // -- until stopped --------------------------------------
             void PulseIn(IVisualElementScheduledItem repeated)
             {
                 if (!repeated.isActive) { DoCleanup(); return; }
@@ -170,7 +182,7 @@ namespace instance.id.EATK
                     color2DurationMs, () => { if(!repeated.isActive) DoCleanup();}).KeepAlive();
             } // @formatter:on
 
-            var recurring = color1DurationMs + color2DurationMs + 20;
+            var recurring = color1DurationMs + color2DurationMs + 20 + delayBetween;
 
             repeatedAnim = element.schedule
                 .Execute(() => { PulseIn(repeatedAnim); })

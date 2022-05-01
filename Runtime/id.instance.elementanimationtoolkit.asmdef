@@ -1,7 +1,13 @@
 {
     "name": "id.instance.elementanimationtoolkit",
     "rootNamespace": "",
-    "references": [],
+    "references": [
+        "GUID:0d5f5efb257a4ba8381131a24e714869",
+        "GUID:478a2357cc57436488a56e564b08d223",
+        "GUID:9e24947de15b9834991c9d8411ea37cf",
+        "GUID:8819f35a0fc84499b990e90a4ca1911f",
+        "GUID:1759fe4a67488100793613cc6bf36c6d"
+    ],
     "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
@@ -14,6 +20,16 @@
             "name": "id.instance.extensions",
             "expression": "",
             "define": "USING_IDEXTENSIONS"
+        },
+        {
+            "name": "com.unity.addressables",
+            "expression": "",
+            "define": "USING_ADDRESSABLES"
+        },
+        {
+            "name": "com.unity.rendering.hybrid",
+            "expression": "",
+            "define": "USING_HYBRID"
         }
     ],
     "noEngineReferences": false

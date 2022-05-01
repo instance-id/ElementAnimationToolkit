@@ -30,7 +30,7 @@ namespace instance.id.EATK
             return result;
         }
 
-        public static bool TryAddValue<TKey, TValue>(this IDictionary<TKey, TValue> dictionary, TKey key, TValue value)
+        public static bool TryAdd<TKey, TValue>(this IDictionary<TKey, TValue> dictionary, TKey key, TValue value)
         {
             if (!dictionary.ContainsKey(key))
             {
@@ -41,7 +41,7 @@ namespace instance.id.EATK
             return false;
         }
 
-        public static bool TryAddValue<TKey, TValue>(this Dictionary<TKey, TValue> dictionary, TKey key, TValue value)
+        public static bool TryAdd<TKey, TValue>(this Dictionary<TKey, TValue> dictionary, TKey key, TValue value)
         {
             if (!dictionary.ContainsKey(key))
             {
@@ -56,7 +56,7 @@ namespace instance.id.EATK
         {
             foreach (var k in keys)
             {
-                dictionary.TryAddValue(k, value);
+                dictionary.TryAdd(k, value);
             }
         }
 
@@ -146,7 +146,7 @@ namespace instance.id.EATK
         
         #region List
 
-        public static bool TryAddValue<TValue>(this List<TValue> list, TValue value)
+        public static bool TryAdd<TValue>(this List<TValue> list, TValue value)
         {
             if (list.Contains(value)) return false;
             list.Add(value);
@@ -198,7 +198,7 @@ namespace instance.id.EATK
             return forEach;
         }
 
-        public static void ForEach<T>(this IEnumerable<T> ie, Action<T> action)
+        public static void forEach<T>(this IEnumerable<T> ie, Action<T> action)
         {
             foreach (var i in ie)
             {

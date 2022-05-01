@@ -191,7 +191,7 @@ namespace instance.id.EATK
             root.Add(toolbar);
             root.Add(elementBox);
 
-            buttonContainerDictionary.ForEach(x =>
+            buttonContainerDictionary.forEach(x =>
             {
                 x.Value.AddToClassList("rightEdgePadding");
                 x.Value.JumpToCode("ButtonCascadeAnimation", true, "Jump To Animation",
@@ -834,7 +834,7 @@ namespace instance.id.EATK
                 var totalCount = buttonContainerDictionary.Count;
 
                 // -- Iterate over the dictionary of row elements --------
-                buttonContainerDictionary.ForEach(x =>
+                buttonContainerDictionary.forEach(x =>
                 {
                     // -- Then query for each button within the row ------
                     // -- Set default button cascade delay and counters --
@@ -880,7 +880,7 @@ namespace instance.id.EATK
                 void StartReturnLoop()
                 {
                     var loopTime = 0;
-                    buttonContainerDictionary.ForEach(x =>
+                    buttonContainerDictionary.forEach(x =>
                     {
                         var buttons = x.Value.Query<Button>().ToList();
                         var buttonCascade = 100;
