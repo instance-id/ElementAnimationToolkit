@@ -264,7 +264,7 @@ namespace instance.id.EATK.Extensions
             if (containerElement != null)
             {
                 containerElement.AddToClassList("addHighlightBorder");
-                inspectorElements.TryAddValue(containerElement);
+                inspectorElements.TryAdd(containerElement);
 
                 void Cleanup()
                 {
@@ -285,7 +285,7 @@ namespace instance.id.EATK.Extensions
             var headerElement = containerElement
                 .Children()
                 .FirstOrDefault(x => x.name.Contains("(Script)Header"));
-            inspectorElements.TryAddValue(headerElement);
+            inspectorElements.TryAdd(headerElement);
 
             // -- Header Setup -------------------------------------------
             if (headerElement != null)

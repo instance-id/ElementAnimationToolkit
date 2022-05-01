@@ -1,3 +1,4 @@
+#if UNITY_EDITOR
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,6 +8,7 @@ using UnityEngine.UIElements;
 using Vector2 = UnityEngine.Vector2;
 using Vector3 = UnityEngine.Vector3;
 using Vector4 = UnityEngine.Vector4;
+using UnityObject = UnityEngine.Object;
 
 namespace instance.id.EATK.Extensions
 {
@@ -29,8 +31,7 @@ namespace instance.id.EATK.Extensions
                 Dictionary<int, string> uniqueContainers = new Dictionary<int, string>();
 
                 var attributes = classData.GetEditorAttributes<EditorFieldAttribute>();
-
-
+                
                 foreach (var v in attributes.fieldDatas)
                 {
                     var data = v.Value.attributeData.container;
@@ -42,16 +43,16 @@ namespace instance.id.EATK.Extensions
                     switch (data.containerType)
                     {
                         case ContainerStyle.AnimatedFoldout:
-                            containers.TryAddValue((data.containerId, data.containerName), CreateAnimatedFoldout(data));
-                            containerTypes.TryAddValue(typeof(AnimatedFoldout), containers[(data.containerId, data.containerName)]);
+                            containers.TryAdd((data.containerId, data.containerName), CreateAnimatedFoldout(data));
+                            containerTypes.TryAdd(typeof(AnimatedFoldout), containers[(data.containerId, data.containerName)]);
                             break;
                         case ContainerStyle.Foldout:
-                            containers.TryAddValue((data.containerId, data.containerName), CreateFoldout(data));
-                            containerTypes.TryAddValue(typeof(Foldout), containers[(data.containerId, data.containerName)]);
+                            containers.TryAdd((data.containerId, data.containerName), CreateFoldout(data));
+                            containerTypes.TryAdd(typeof(Foldout), containers[(data.containerId, data.containerName)]);
                             break;
                         case ContainerStyle.Box:
-                            containers.TryAddValue((data.containerId, data.containerName), CreateBox(data));
-                            containerTypes.TryAddValue(typeof(Box), containers[(data.containerId, data.containerName)]);
+                            containers.TryAdd((data.containerId, data.containerName), CreateBox(data));
+                            containerTypes.TryAdd(typeof(Box), containers[(data.containerId, data.containerName)]);
                             break;
                         default:
                             throw new ArgumentOutOfRangeException();
@@ -70,8 +71,8 @@ namespace instance.id.EATK.Extensions
                         .SetParent(parent.Value);
                 }
 
-                containers.ForEach(x => { generatedElements.Add(x.Value); });
-                containerTypes.ForEach(x =>
+                containers.forEach(x => { generatedElements.Add(x.Value); });
+                containerTypes.forEach(x =>
                 {
                     if (x.Key == typeof(AnimatedFoldout))
                         generatedElements.Query<AnimatedFoldout>()
@@ -128,6 +129,9 @@ namespace instance.id.EATK.Extensions
                 case Type t when t == typeof(Color):
                     return new ColorField { value = (Color)value, style = { flexGrow = 1 } }
                         .RegisterValueCallback<ColorField, ChangeEvent<Color>>(evt => fieldData.fieldInfo.SetValue(classData, evt.newValue));
+                // case Type t when value.GetType().IsDerivingFrom()
+                //     return new ObjectField { value = (UnityObject)value, style = { flexGrow = 1 } }
+                //         .RegisterValueCallback<ObjectField, ChangeEvent<UnityObject>>(evt => fieldData.fieldInfo.SetValue(classData, evt.newValue));
                 case Type t when t.IsEnum:
                     var e = new EnumField() { style = { flexGrow = 1 } };
                     e.Init((System.Enum)fieldData.fieldInfo.GetValue(classData));
@@ -143,3 +147,4 @@ namespace instance.id.EATK.Extensions
         }
     }
 }
+#endif

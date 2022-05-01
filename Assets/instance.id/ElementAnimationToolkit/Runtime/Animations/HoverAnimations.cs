@@ -111,28 +111,29 @@ namespace instance.id.EATK
         /// <code>
         /// var originalColor = ColorUtil.FromHex("#BABABA");
         /// var hoverBGColor = ColorUtil.FromHex("#2F569C");
-        ///
+        /// 
         /// label.HoverBackground(originalColor, hoverBGColor);
         /// </code>
         /// </example>>
         /// <param name="target">The element in which this function will be applied</param>
         /// <param name="original">The original color of the element being changed. Can be obtained and passed via 'visualElement.style.backgroundColor.value'</param>
         /// <param name="hoverColor">The color to fade to when element is hovered</param>
+        /// <param name="animDuration">Transition animation duration when switching between states</param>
         /// <param name="condition">Create a condition to pass to this function. Example: bool Condition(VisualElement sRow) => selectedRow == packageListRow;</param>
         /// <param name="conditionElement">The element in which the optional condition will be evaluated. Ex. in the example of 'bool Condition(VisualElement sRow) => selectedRow == packageListRow;', the conditionalElement would be 'VisualElement selectedRow'</param>
         /// <param name="animate">Whether to animate the transition of the background color</param>
         public static void HoverBackground(this VisualElement target, StyleColor original, Color hoverColor, Func<VisualElement, bool> condition = null,
-        VisualElement conditionElement = null, bool animate = false)
+        VisualElement conditionElement = null, bool animate = false, int animDuration = 250)
         {
             var mouseOver = new ValueAnimation<StyleValues>();
             var mouseOut = new ValueAnimation<StyleValues>();
 
             if (animate)
             {
-                mouseOver = target.AnimateBackgroundColor(original.value, hoverColor, 250);
+                mouseOver = target.AnimateBackgroundColor(original.value, hoverColor, animDuration);
                 mouseOver.KeepAlive();
 
-                mouseOut = target.AnimateBackgroundColor(hoverColor, original.value, 250);
+                mouseOut = target.AnimateBackgroundColor(hoverColor, original.value, animDuration);
                 mouseOut.KeepAlive();
             }
 
@@ -430,6 +431,33 @@ namespace instance.id.EATK
 
         #endregion
 
+                // -------------------------------------------------- @HoverBorder
+        // ---------------------------------------------------------------
+        /// <summary>
+        /// Adds background hover capability that will not be lost like CSS:hover when programatically setting background color
+        /// 
+        /// ** To help combat your element shifting position slightly when a border is applied on hover,
+        /// it is a good idea to add a border to your element before hand and just set color to 'initial'
+        /// so that it is transparent, then keep 'addBorder' parameter as false.
+        /// </summary>
+        /// <param name="target">The element in which this function will be applied</param>
+        /// <param name="startValue"></param>
+        /// <param name="endValue"></param>
+        /// <param name="animDuration"></param>
+        public static void HoverOpacity(this VisualElement target, float startValue, float endValue, int animDuration = 500)
+        {
+            target.RegisterCallback<MouseOverEvent>(evt =>
+            {
+                target.AnimateOpacity(startValue, endValue, animDuration);
+                evt.StopPropagation();
+            });
+            target.RegisterCallback<MouseOutEvent>(evt =>
+            {
+                target.AnimateOpacity(endValue, startValue, animDuration);
+                evt.StopPropagation();
+            });
+        }
+        
         // -------------------------------------------------------- @HoverWidth
         // -- Animate the width of target element to desired value on hover  --
         // --------------------------------------------------------------------

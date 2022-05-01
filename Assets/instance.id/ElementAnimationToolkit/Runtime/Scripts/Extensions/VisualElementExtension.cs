@@ -5,17 +5,26 @@
 
 #if UNITY_EDITOR
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Numerics;
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UIElements;
 using UnityEditor;
+using UnityEngine.UIElements;
 using UnityEditor.UIElements;
-using Quaternion = UnityEngine.Quaternion;
 using Vector2 = UnityEngine.Vector2;
 using Vector3 = UnityEngine.Vector3;
 using Vector4 = UnityEngine.Vector4;
+using UnityObject = UnityEngine.Object;
+using Quaternion = UnityEngine.Quaternion;
+
+#if USING_HYBRID
+using Unity.Entities;
+#endif
+
+#if USING_ADDRESSABLES
+using UnityEngine.AddressableAssets;
+#endif
 
 namespace instance.id.EATK.Extensions
 {
@@ -30,7 +39,6 @@ namespace instance.id.EATK.Extensions
         private static StyleEnum<FlexDirection> directionCol = new StyleEnum<FlexDirection>(FlexDirection.Column);
 
         #region General VisualElement
-
         public enum ContainerType
         {
             Row,
@@ -52,10 +60,50 @@ namespace instance.id.EATK.Extensions
 #endif
         public static TextField CreateTextField(this TextField textField, EventCallback<ChangeEvent<string>> evt = null, string label = null)
         {
-            textField = new TextField { label = label };
+            textField = new TextField {label = label};
             if (evt != null) textField.RegisterCallback(evt);
             return textField;
         }
+
+
+        #region Build Visual Elements
+        // --| BuildRoot ---------------------------------------
+        public static T Root<T>(this T element, out VisualElement variable, StyleSheet styleSheet = default, string name = null, params StyleSheet[] stylesheets)
+            where T : VisualElement
+        {
+            if (name != null) element.name = name;
+            else element.name = "inspectorRoot";
+            element.AddToClassList(element.name);
+            element.styleSheets.Add(styleSheet);
+
+            if (stylesheets.Length != 0)
+                for (int i = 0; i < stylesheets.Length; i++)
+                {
+                    element.styleSheets.Add(stylesheets[i]);
+                }
+
+            return (T) (variable = element);
+        }
+
+        // --| BuildHeader -------------------------------------
+        public static T BuildHeader<T>(this T element, string headerText, string className, string labelClass = null) where T : VisualElement
+        {
+            var classString = labelClass ?? className;
+            return element.Create($"{className}LabelContainer", $"{className}LabelContainer").AddAll(new VisualElement[]
+            {
+                new Label(headerText).Create($"{className}Label", $"{classString}Label")
+            });
+        }
+
+        public static T BuildHeader<T>(this T element, out T variable, string headerText, string className, string labelClass = null) where T : VisualElement
+        {
+            var classString = labelClass ?? className;
+            return variable = element.Create($"{className}LabelContainer", $"{className}LabelContainer").AddAll(new VisualElement[]
+            {
+                new Label(headerText).Create($"{className}Label", $"{classString}Label")
+            });
+        }
+        #endregion
 
         // --|--------------------------------------- Containers
         // --|--------------------------------------------------
@@ -66,11 +114,16 @@ namespace instance.id.EATK.Extensions
         /// <param name="element">The target element to perform this action upon</param>
         /// <param name="variable">Returns the element as an out variable to allow the user of the nameof() function in chained methods</param>
         /// <param name="name">If a name is specifically passed as a parameter, it will be used, otherwise the target variable name is used</param>
+        /// <param name="justification">Set the content justification setting</param>
         /// <typeparam name="T">VisualElement</typeparam>
-        public static T CreateRow<T>(this T element, out T variable, string name = null) where T : VisualElement
+        public static T CreateRow<T>(this T element, out T variable, string name = null, Justify justification = default) where T : VisualElement
         {
             if (name != null) element.name = name;
             element.style.flexDirection = directionRow;
+
+            if (justification != default)
+                element.style.justifyContent = justification;
+
             return variable = element;
         }
 
@@ -109,6 +162,64 @@ namespace instance.id.EATK.Extensions
             return element;
         }
 
+        public static T Create<T>(this T element, string name, string className) where T : VisualElement
+        {
+            if (name != null) element.name = name;
+            element.AddToClassList(name);
+            element.AddToClassList(className);
+            return element;
+        }
+
+        public static Image Create(this Image element, UnityObject obj, out Image variable, string name = null)
+        {
+            if (name != null) element.name = name;
+            element.image = TryGetPreview(obj);
+            return variable = element;
+        }
+
+        /// <summary>
+        /// Retrieves the child VisualElement from the parent contentContainer at index 1
+        /// <example>
+        /// <code>
+        /// new EnumField(ExampleEnum.ENUM_VALUE)
+        ///     .CreateWithLabel(
+        ///         out var exampleEnum,
+        ///         labelText: "Example Enum Field: ",
+        ///         labelClass: "labelRow",
+        ///         elementClass: "fieldRow"
+        ///     ).ToUSS(nameof(exampleEnum));
+        ///   
+        /// ((EnumField)exampleEnum).GetField().RegisterValueChangedCallback(evt =>
+        /// {
+        ///     Debug.Log($"{((ExampleEnum)evt.newValue).ToString()}");
+        /// });
+        /// </code>
+        /// </example>
+        /// </summary>
+        /// <param name="element"></param>
+        /// <typeparam name="E">The type in which the element actually is</typeparam>
+        /// <returns></returns>
+        public static E GetField<E>(this VisualElement element)
+            where E : VisualElement
+        {
+            return (E) element.contentContainer[1];
+        }
+
+        public static E GetField<T, E>(this T element)
+            where T : VisualElement
+            where E : VisualElement
+        {
+            return (E) element.contentContainer[1];
+        }
+
+        public static E GetLabel<T, E>(this T element)
+            where T : VisualElement
+            where E : VisualElement
+        {
+            return (E) element.contentContainer[0];
+        }
+
+
         /// <summary>
         /// Creates the VisualElement and return it as an out variable which can be chained to .ToUSS()
         /// <example><code>new VisualElement().Create(out var myElement);</code></example>
@@ -117,8 +228,10 @@ namespace instance.id.EATK.Extensions
         /// <param name="variable">Returns the element as an out variable to allow the user of the nameof() function in chained methods</param>
         /// <param name="name">If a name is specifically passed as a parameter, it will be used, otherwise the target variable name is used</param>
         /// <param name="containerType">Whether this element should be a row or column</param>
+        /// <param name="labelText">The text string for the label to display</param>
         /// <typeparam name="T">VisualElement</typeparam>
-        public static VisualElement CreateWithLabel<T>(this T element, out VisualElement variable, string name = null, ContainerType containerType = ContainerType.Row, string labelText = default, float labelMinWidth = default) where T : VisualElement
+        public static VisualElement CreateWithLabel<T>(this T element, out VisualElement variable, string name = null, ContainerType containerType = ContainerType.Row, string labelText = "", string labelClass = default, float labelMinWidth = default, string elementClass = default)
+            where T : VisualElement
         {
             StyleEnum<FlexDirection> direction = containerType == ContainerType.Row
                 ? new StyleEnum<FlexDirection>(FlexDirection.Row)
@@ -126,9 +239,17 @@ namespace instance.id.EATK.Extensions
 
             if (name != null) element.name = name;
 
-            new VisualElement { style = { flexDirection = direction } }.Create(out var elementContainer).ToUSS($"{element.name}Container", (containerType == ContainerType.Row ? "containerRow" : "containerColumn"), labelText);
-            if (labelMinWidth != default) new Label { text = labelText, style = { minWidth = labelMinWidth } }.Create().ToUSS($"{element.name}Label").SetParent(elementContainer);
-            else new Label { text = labelText }.Create().ToUSS($"{element.name}Label").SetParent(elementContainer);
+            if (labelClass == default) labelClass = $"{element.name}Label";
+            if (elementClass != default) element.AddToClassList(elementClass);
+
+            Label label;
+
+            new VisualElement {style = {flexDirection = direction}}.Create(out var elementContainer).ToUSS($"{element.name}Container", (containerType == ContainerType.Row ? "containerRow" : "containerColumn"), labelText);
+            if (labelMinWidth != default) new Label {text = labelText, style = {minWidth = labelMinWidth}}.Create(out label).ToUSS($"{element.name}Label", labelClass).SetParent(elementContainer);
+            else new Label {text = labelText}.Create(out label).ToUSS($"{element.name}Label", labelClass).SetParent(elementContainer);
+            label.style.alignSelf = Align.Center;
+            label.style.paddingTop = 0;
+            element.style.alignSelf = Align.Center;
 
             element.SetParent(elementContainer);
             return variable = elementContainer;
@@ -144,9 +265,9 @@ namespace instance.id.EATK.Extensions
 
             if (name != null) element.name = name;
 
-            new VisualElement { style = { flexDirection = direction } }.Create(out var elementContainer).ToUSS($"{element.name}Container", (containerType == ContainerType.Row ? "containerRow" : "containerColumn"), labelText);
-            if (labelMinWidth != default) new Label { text = labelText, style = { minWidth = labelMinWidth } }.Create().ToUSS($"{element.name}Label").SetParent(elementContainer);
-            else new Label { text = labelText }.Create().ToUSS($"{element.name}Label").SetParent(elementContainer);
+            new VisualElement {style = {flexDirection = direction}}.Create(out var elementContainer).ToUSS($"{element.name}Container", (containerType == ContainerType.Row ? "containerRow" : "containerColumn"), labelText);
+            if (labelMinWidth != default) new Label {text = labelText, style = {minWidth = labelMinWidth}}.Create().ToUSS($"{element.name}Label").SetParent(elementContainer);
+            else new Label {text = labelText}.Create().ToUSS($"{element.name}Label").SetParent(elementContainer);
 
             if (onValueChanged != null)
                 element.RegisterCallback(onValueChanged);
@@ -154,7 +275,94 @@ namespace instance.id.EATK.Extensions
             element.SetParent(elementContainer);
             return variable = elementContainer;
         }
-        
+
+        public static VisualElement CreateWithHeader<T>(this T element, out VisualElement variable, string name = null, ContainerType containerType = ContainerType.Column,
+        string labelText = default,
+        string labelClass = default,
+        float labelMinWidth = default,
+        string elementClass = default,
+        float headerLabelHeight = default)
+            where T : VisualElement
+        {
+            StyleEnum<FlexDirection> direction = containerType == ContainerType.Row
+                ? new StyleEnum<FlexDirection>(FlexDirection.Row)
+                : new StyleEnum<FlexDirection>(FlexDirection.Column);
+
+            if (name != null) element.name = name;
+
+            if (labelClass == default) labelClass = $"{element.name}Label";
+            if (elementClass != default) element.AddToClassList(elementClass);
+
+            Label label;
+            VisualElement elementContainer = new VisualElement();
+            bool isBox = false;
+            if (typeof(T) == typeof(Box))
+            {
+                elementContainer = element;
+                elementContainer.style.paddingLeft = 10;
+                elementContainer.style.paddingBottom = 5;
+                isBox = true;
+            }
+            else new VisualElement {style = {flexDirection = direction}}.Create(out elementContainer).ToUSS($"{element.name}Container", (containerType == ContainerType.Row ? "containerRow" : "containerColumn"), labelText);
+
+            if (labelMinWidth != default) new Label {text = labelText, style = {minWidth = labelMinWidth}}.Create(out label).ToUSS($"{element.name}Label", labelClass).SetParent(elementContainer);
+            else new Label {text = labelText}.Create(out label).ToUSS($"{element.name}Label", labelClass).SetParent(elementContainer);
+
+            var hrColor = Colors.DolphinGray;
+            hrColor.a = 0.5f;
+            HR(elementContainer, leftMargin: -4, rightMargin: 5, bottomMargin: 3, thickness: 1, color: hrColor);
+            label.style.unityFontStyleAndWeight = FontStyle.Bold;
+
+            label.style.alignSelf = Align.FlexStart;
+            label.style.paddingTop = headerLabelHeight;
+            label.style.marginLeft = -4;
+
+            if (!isBox)
+            {
+                element.style.alignSelf = Align.Center;
+                element.SetParent(elementContainer);
+            }
+
+            return variable = elementContainer;
+        }
+
+        // --| CustomElements -----------------------------
+        // --|---------------------------------------------
+        public static VisualElement HR<T>(this T element, out VisualElement variable, float topMargin = default, float bottomMargin = default, float leftMargin = default, float rightMargin = default, float allMargins = default, Color color = default, float thickness = default,
+        VisualElement root = default)
+            where T : VisualElement
+        {
+            new VisualElement().Create(out var horizontalRule).ToUSS(nameof(horizontalRule));
+            if (root != default) horizontalRule.SetParent(root);
+
+            if (allMargins != default) topMargin = bottomMargin = leftMargin = rightMargin = allMargins;
+            if (thickness != default) horizontalRule.style.borderBottomWidth = thickness;
+            if (topMargin != default) horizontalRule.style.marginTop = topMargin;
+            if (bottomMargin != default) horizontalRule.style.marginBottom = bottomMargin;
+            if (leftMargin != default) horizontalRule.style.marginLeft = leftMargin;
+            if (rightMargin != default) horizontalRule.style.marginRight = rightMargin;
+            if (color != default) horizontalRule.style.borderBottomColor = color;
+
+            return variable = horizontalRule;
+        }
+
+        public static VisualElement HR(VisualElement root = default, float topMargin = default, float bottomMargin = default, float leftMargin = default, float rightMargin = default, float allMargins = default, Color color = default, float thickness = default)
+        {
+            new VisualElement().Create(out var horizontalRule).ToUSS(nameof(horizontalRule));
+            if (root != default)
+                horizontalRule.SetParent(root);
+
+            if (allMargins != default) topMargin = bottomMargin = leftMargin = rightMargin = allMargins;
+            if (thickness != default) horizontalRule.style.borderBottomWidth = thickness;
+            if (topMargin != default) horizontalRule.style.marginTop = topMargin;
+            if (bottomMargin != default) horizontalRule.style.marginBottom = bottomMargin;
+            if (leftMargin != default) horizontalRule.style.marginLeft = leftMargin;
+            if (rightMargin != default) horizontalRule.style.marginRight = rightMargin;
+            if (color != default) horizontalRule.style.borderBottomColor = color;
+
+            return horizontalRule;
+        }
+
         /// <summary>
         /// Is elementName is passed, sets the target elements name and USS class to elementName.
         /// If no parameter is passed, the element USS class is set to the targets current name.
@@ -171,7 +379,7 @@ namespace instance.id.EATK.Extensions
         {
             if (elementClassNames != null && element.name != null)
             {
-                element.name = elementClassNames[0];
+                element.name = elementClassNames.FirstOrDefault();
                 for (var i = 0; i < elementClassNames.Length; i++)
                     element.AddToClassList(elementClassNames[i]);
             }
@@ -197,16 +405,126 @@ namespace instance.id.EATK.Extensions
 
         public static T RegisterValueCallback<T, E>(this T element, EventCallback<E> changeEvent) where T : VisualElement where E : EventBase<E>, new()
         {
-            ((VisualElement)element).RegisterCallback(changeEvent);
+            ((VisualElement) element).RegisterCallback(changeEvent);
+            return element;
+        }
+
+        public static T RegisterValueChangeCallback<T, E>(this T element, EventCallback<E> changeEvent) where T : VisualElement where E : EventBase<E>, new()
+        {
+            ((VisualElement) element).RegisterCallback(changeEvent);
+            return element;
+        }
+
+        // public static T RegisterValue<T,E>(this T element, E valueObject, EventCallback<ChangeEvent<E>> evt = default)
+        //     where T : VisualElement
+        //     where E : UnityObject
+        // {
+        //     element.value = valueObject;
+        //     element.RegisterValueChangedCallback(evt);
+        //     return element;
+        // }
+        
+        public static T RegisterValue<T,TE>(this T element, TE valueObject, EventCallback<ChangeEvent<TE>> evt = default)
+            where T : ObjectField
+            where TE : UnityObject
+        {
+            element.value = valueObject;
+            element.RegisterCallback(evt);
             return element;
         }
         
-        public static T RegisterValueChangeCallback<T, E>(this T element, EventCallback<E> changeEvent) where T : VisualElement where E : EventBase<E>, new()
+        public static ColorField RegisterValue(this ColorField element, Color valueObject, EventCallback<ChangeEvent<Color>> evt = default)
         {
-            ((VisualElement)element).RegisterCallback(changeEvent);
+            element.value = valueObject;
+            element.RegisterValueChangedCallback(evt);
             return element;
         }
- 
+
+        public static Toggle RegisterValue(this Toggle element, bool valueObject, EventCallback<ChangeEvent<bool>> evt = default)
+        {
+            element.value = valueObject;
+            element.RegisterValueChangedCallback(evt);
+            return element;
+        }
+
+
+        public static Slider RegisterValue(this Slider element, float valueObject, EventCallback<ChangeEvent<float>> evt = default)
+        {
+            element.value = valueObject;
+            element.RegisterValueChangedCallback(evt);
+            return element;
+        }
+
+        public static FloatField RegisterValue(this FloatField element, float valueObject, EventCallback<ChangeEvent<float>> evt = default)
+        {
+            element.value = valueObject;
+            element.RegisterValueChangedCallback(evt);
+            return element;
+        }
+
+        public static IntegerField RegisterValue(this IntegerField element, int valueObject, EventCallback<ChangeEvent<int>> evt = default)
+        {
+            element.value = valueObject;
+            element.RegisterValueChangedCallback(evt);
+            return element;
+        }
+
+        public static TextField RegisterValue(this TextField element, string valueObject, EventCallback<ChangeEvent<string>> evt = default)
+        {
+            element.value = valueObject;
+            element.RegisterValueChangedCallback(evt);
+            return element;
+        }
+
+        public static EnumField RegisterValue(this EnumField element, Enum valueObject, EventCallback<ChangeEvent<Enum>> evt = default)
+        {
+            element.value = valueObject;
+            element.RegisterValueChangedCallback(evt);
+            return element;
+        }
+
+        public static MinMaxSlider RegisterValue(this MinMaxSlider element, Vector2 valueObject, EventCallback<ChangeEvent<Vector2>> evt = default)
+        {
+            element.value = valueObject;
+            element.RegisterValueChangedCallback(evt);
+            return element;
+        }
+        
+        public static LayerMaskField RegisterValue(this LayerMaskField element, LayerMask valueObject, EventCallback<ChangeEvent<LayerMask>> evt = default)
+        {
+            element.value = valueObject;
+            element.RegisterCallback(evt);
+            return element;
+        }
+
+        // public static PropertyField RegisterValue(this PropertyField element, string valueObject, EventCallback<ChangeEvent<string>> evt = default)
+        // {
+        //     element.value = valueObject;
+        //     element.RegisterCallback(evt);
+        //     return element;
+        // }
+        
+#if USING_HYBRID
+        // public static ObjectField RegisterValue(this ObjectField element, GameObjectEntity valueObject, EventCallback<ChangeEvent<UnityObject>> evt = default)
+        // {
+        //     element.value = valueObject;
+        //     element.RegisterValueChangedCallback(evt);
+        //
+        //
+        //     return element;
+        // }
+#endif
+
+#if USING_ADDRESSABLES
+        public static ObjectField RegisterValue(this ObjectField element, AssetReference valueObject, EventCallback<ChangeEvent<UnityObject>> evt = default)
+        {
+            element.value = valueObject.editorAsset;
+            element.objectType = valueObject != null ? valueObject.GetType() : default;
+            element.RegisterValueChangedCallback(evt);
+            return element;
+        }
+#endif
+
         /// <summary>
         /// Convert an object to another type
         /// </summary>
@@ -214,7 +532,7 @@ namespace instance.id.EATK.Extensions
         /// <typeparam name="T">VisualElement</typeparam>
         static T Convert<T>(object value)
         {
-            return (T)System.Convert.ChangeType(value, typeof(T));
+            return (T) System.Convert.ChangeType(value, typeof(T));
         }
 
         /// <summary>
@@ -256,9 +574,7 @@ namespace instance.id.EATK.Extensions
 
             return parent;
         }
-
         #endregion
-
         #endregion
 
         public static VisualElement GetFirstAncestorWithClass(this VisualElement element, string className)
@@ -287,7 +603,7 @@ namespace instance.id.EATK.Extensions
         /// <param name="element">Current element to search parents.</param>
         /// <typeparam name="T">Type which you want to find</typeparam>
         /// <returns>Collection of T instances found.</returns>
-        public static IEnumerable<T> GetParentsOfType<T>(this T element, T type = null) where T : VisualElement
+        public static IEnumerable<T> GetParentsOfType<T>(this VisualElement element, T type = null) where T : VisualElement
         {
             Debug.Log($"Type {typeof(T).Name}");
 
@@ -299,7 +615,7 @@ namespace instance.id.EATK.Extensions
                 if (parent is T selected)
                     result.Add(selected);
 
-                parent = (T)parent.parent;
+                parent = (VisualElement) (T) parent.parent;
             }
 
             return result;
@@ -327,7 +643,7 @@ namespace instance.id.EATK.Extensions
         /// <returns>T instance found</returns>
         public static T GetFirstParentOfType<T>(this VisualElement element) where T : VisualElement
         {
-            return GetParentsOfType<T>((T)element).FirstOrDefault();
+            return GetParentsOfType<T>((T) element).FirstOrDefault();
         }
 
         public static T GetFirstAncestorOfType<T>(this VisualElement element, Type elementType) where T : VisualElement
@@ -460,6 +776,7 @@ namespace instance.id.EATK.Extensions
         /// <param name="toggleTimer">The amount of time in which to wait before the toggles value is changed.
         /// Default: 1000ms</param>
         /// <param name="interruptible">Whether the automatic toggle should be interrupted if the cursor is placed back into the bounds of the target element</param>
+        /// <param name="interruption"></param>
         /// <typeparam name="T">VisualElement</typeparam>
         public static T AutoToggleAfter<T>(this T element, Toggle toggleTarget, long toggleTimer = 1000, bool interruptible = false, bool autoToggleValue = false)
             where T : VisualElement
@@ -490,10 +807,43 @@ namespace instance.id.EATK.Extensions
             return element;
         }
 
+
+        public static T AutoToggleAfterChange<T>(this T element, Toggle toggleTarget, long toggleTimer = 1000, int maxValue = default, bool interruptible = false, bool autoToggleValue = false)
+            where T : VisualElement
+        {
+            bool interrupter = false;
+            IVisualElementScheduledItem menuCloser = element.schedule.Execute(() =>
+            {
+                if (interrupter == false && toggleTarget.value) toggleTarget.value = autoToggleValue;
+            });
+
+            Action<int> interruption = delegate(int i)
+            {
+                if (i >= maxValue) menuCloser.ExecuteLater(toggleTimer);
+            };
+
+            element.RegisterCallback<MouseOverEvent>(evt =>
+            {
+                if (!interruptible) return;
+
+                interrupter = true;
+                menuCloser?.Pause();
+                evt.StopPropagation();
+            });
+            element.RegisterCallback<MouseLeaveEvent>(evt =>
+            {
+                interrupter = false;
+
+                if (toggleTarget.value)
+                    menuCloser.ExecuteLater(toggleTimer);
+                evt.StopPropagation();
+            });
+
+            return element;
+        }
         #endregion
 
         #region Text Related
-
         public static void SelectRangeDelayed(this TextField textField, int cursorIndex, int selectionIndex)
         {
             textField.schedule.Execute(() =>
@@ -523,16 +873,13 @@ namespace instance.id.EATK.Extensions
 
             return (exposedString, tmpString.Aggregate((i, j) => i + j));
         }
-
         #endregion
 
 
         #region Style Related
-
         // ---------------------------------------------------------------------------------------- Style Changes
 
         #region Style Changes
-
         // ------------------------------------------------ Value adjustments
         /// <summary>
         /// Sets a float value to 0.0001 instead of true 0 due to issues with opacity bugging out.
@@ -540,7 +887,7 @@ namespace instance.id.EATK.Extensions
         /// <param name="num">The target number in which to adjust value</param>
         public static float Zero(this int num)
         {
-            var tmpNum = (float)num;
+            var tmpNum = (float) num;
             tmpNum = 0.0001f;
             return tmpNum;
         }
@@ -604,6 +951,20 @@ namespace instance.id.EATK.Extensions
             element.style.borderLeftWidth = borderThickness;
             element.style.borderRightWidth = borderThickness;
             element.style.borderTopWidth = borderThickness;
+        }
+
+        /// <summary>
+        /// Set the radius value on all sides of the VisualElement
+        /// </summary>
+        /// <param name="element">The target element to add a border</param>
+        /// <param name="radiusValue">The value in which to set the border radius</param>
+        /// <typeparam name="T">VisualElement</typeparam>
+        public static void SetBorderRadius<T>(this T element, float radiusValue = 0) where T : VisualElement
+        {
+            element.style.borderTopLeftRadius = radiusValue;
+            element.style.borderTopRightRadius = radiusValue;
+            element.style.borderBottomLeftRadius = radiusValue;
+            element.style.borderBottomRightRadius = radiusValue;
         }
 
         /// <summary>
@@ -683,6 +1044,22 @@ namespace instance.id.EATK.Extensions
             return element;
         }
 
+        public static T[] SetDisplay<T>(this T[] elements, bool value) where T : VisualElement
+        {
+            foreach (var e in elements)
+            {
+                e.style.display = value ? DisplayStyle.Flex : DisplayStyle.None;
+            }
+
+            return elements;
+        }
+
+        public static bool IfDisplay<T>(this T element, bool value) where T : VisualElement
+        {
+            element.style.display = value ? DisplayStyle.Flex : DisplayStyle.None;
+            return value;
+        }
+
         /// <summary>
         /// Set elements item alignment
         /// </summary>
@@ -732,7 +1109,6 @@ namespace instance.id.EATK.Extensions
             element.style.opacity = opacity;
             return element;
         }
-
         #endregion
 
 
@@ -880,56 +1256,56 @@ namespace instance.id.EATK.Extensions
         {
             var styleValues = new Dictionary<string, object>
             {
-                { nameof(target.style.width), target.style.width = source.Width },
-                { nameof(target.style.height), target.style.height = source.Height },
+                {nameof(target.style.width), target.style.width = source.Width},
+                {nameof(target.style.height), target.style.height = source.Height},
                 {
                     nameof(target.style.maxWidth), target.style.maxWidth =
                         (source.MaxWidth.value == 0 || source.MaxWidth == StyleKeyword.Null) ? new StyleLength(StyleKeyword.Auto) : source.MaxWidth.value
                 },
-                { nameof(target.style.maxHeight), target.style.maxHeight = source.MaxHeight.value == 0 ? new StyleLength(StyleKeyword.Auto) : source.MaxHeight.value },
-                { nameof(target.style.minWidth), target.style.minWidth = source.MinWidth.value == 0 ? new StyleLength(StyleKeyword.Auto) : source.MinWidth.value },
-                { nameof(target.style.minHeight), target.style.minHeight = source.MinHeight.value == 0 ? new StyleLength(StyleKeyword.Auto) : source.MinHeight.value },
-                { nameof(target.style.flexBasis), target.style.flexBasis = source.FlexBasis.value == 0 ? new StyleLength(StyleKeyword.Auto) : source.FlexBasis.value },
-                { nameof(target.style.flexGrow), target.style.flexGrow = source.FlexGrow },
-                { nameof(target.style.flexShrink), target.style.flexShrink = source.FlexShrink },
-                { nameof(target.style.flexDirection), target.style.flexDirection = (FlexDirection)source.FlexDirection.value },
-                { nameof(target.style.flexWrap), target.style.flexWrap = (Wrap)source.FlexWrap.value },
-                { nameof(target.style.marginLeft), target.style.marginLeft = source.MarginLeft },
-                { nameof(target.style.marginTop), target.style.marginTop = source.MarginTop },
-                { nameof(target.style.marginRight), target.style.marginRight = source.MarginRight },
-                { nameof(target.style.marginBottom), target.style.marginBottom = source.MarginBottom },
-                { nameof(target.style.paddingLeft), target.style.paddingLeft = source.PaddingLeft },
-                { nameof(target.style.paddingTop), target.style.paddingTop = source.PaddingTop },
-                { nameof(target.style.paddingRight), target.style.paddingRight = source.PaddingRight },
-                { nameof(target.style.paddingBottom), target.style.paddingBottom = source.PaddingBottom },
-                { nameof(target.style.alignSelf), target.style.alignSelf = (Align)source.AlignSelf.value },
-                { nameof(target.style.unityTextAlign), target.style.unityTextAlign = (TextAnchor)source.UnityTextAlign.value },
-                { nameof(target.style.unityFontStyleAndWeight), target.style.unityFontStyleAndWeight = (FontStyle)source.UnityFontStyleAndWeight.value },
-                { nameof(target.style.fontSize), target.style.fontSize = source.FontSize },
-                { nameof(target.style.whiteSpace), target.style.whiteSpace = (WhiteSpace)source.WhiteSpace.value },
-                { nameof(target.style.color), target.style.color = source.Color },
-                { nameof(target.style.backgroundColor), target.style.backgroundColor = source.BackgroundColor },
-                { nameof(target.style.unityFont), target.style.unityFont = source.UnityFont },
-                { nameof(target.style.unityBackgroundScaleMode), target.style.unityBackgroundScaleMode = (ScaleMode)source.UnityBackgroundScaleMode.value },
-                { nameof(target.style.unityBackgroundImageTintColor), target.style.unityBackgroundImageTintColor = source.UnityBackgroundImageTintColor },
-                { nameof(target.style.alignItems), target.style.alignItems = (Align)source.AlignItems.value },
-                { nameof(target.style.alignContent), target.style.alignContent = (Align)source.AlignContent.value },
-                { nameof(target.style.justifyContent), target.style.justifyContent = (Justify)source.JustifyContent.value },
-                { nameof(target.style.borderLeftColor), target.style.borderLeftColor = source.BorderLeftColor },
-                { nameof(target.style.borderRightColor), target.style.borderRightColor = source.BorderRightColor },
-                { nameof(target.style.borderTopColor), target.style.borderTopColor = source.BorderTopColor },
-                { nameof(target.style.borderBottomColor), target.style.borderBottomColor = source.BorderBottomColor },
-                { nameof(target.style.borderLeftWidth), target.style.borderLeftWidth = source.BorderLeftWidth },
-                { nameof(target.style.borderRightWidth), target.style.borderRightWidth = source.BorderRightWidth },
-                { nameof(target.style.borderTopWidth), target.style.borderTopWidth = source.BorderTopWidth },
-                { nameof(target.style.borderBottomWidth), target.style.borderBottomWidth = source.BorderBottomWidth },
-                { nameof(target.style.borderTopLeftRadius), target.style.borderTopLeftRadius = source.BorderTopLeftRadius },
-                { nameof(target.style.borderTopRightRadius), target.style.borderTopRightRadius = source.BorderTopRightRadius },
-                { nameof(target.style.borderBottomLeftRadius), target.style.borderBottomLeftRadius = source.BorderBottomLeftRadius },
-                { nameof(target.style.borderBottomRightRadius), target.style.borderBottomRightRadius = source.BorderBottomRightRadius },
-                { nameof(target.style.opacity), target.style.opacity = source.Opacity.value },
-                { nameof(target.style.visibility), target.style.visibility = (Visibility)source.Visibility.value },
-                { nameof(target.style.display), target.style.display = (DisplayStyle)source.Display.value }
+                {nameof(target.style.maxHeight), target.style.maxHeight = source.MaxHeight.value == 0 ? new StyleLength(StyleKeyword.Auto) : source.MaxHeight.value},
+                {nameof(target.style.minWidth), target.style.minWidth = source.MinWidth.value == 0 ? new StyleLength(StyleKeyword.Auto) : source.MinWidth.value},
+                {nameof(target.style.minHeight), target.style.minHeight = source.MinHeight.value == 0 ? new StyleLength(StyleKeyword.Auto) : source.MinHeight.value},
+                {nameof(target.style.flexBasis), target.style.flexBasis = source.FlexBasis.value == 0 ? new StyleLength(StyleKeyword.Auto) : source.FlexBasis.value},
+                {nameof(target.style.flexGrow), target.style.flexGrow = source.FlexGrow},
+                {nameof(target.style.flexShrink), target.style.flexShrink = source.FlexShrink},
+                {nameof(target.style.flexDirection), target.style.flexDirection = (FlexDirection) source.FlexDirection.value},
+                {nameof(target.style.flexWrap), target.style.flexWrap = (Wrap) source.FlexWrap.value},
+                {nameof(target.style.marginLeft), target.style.marginLeft = source.MarginLeft},
+                {nameof(target.style.marginTop), target.style.marginTop = source.MarginTop},
+                {nameof(target.style.marginRight), target.style.marginRight = source.MarginRight},
+                {nameof(target.style.marginBottom), target.style.marginBottom = source.MarginBottom},
+                {nameof(target.style.paddingLeft), target.style.paddingLeft = source.PaddingLeft},
+                {nameof(target.style.paddingTop), target.style.paddingTop = source.PaddingTop},
+                {nameof(target.style.paddingRight), target.style.paddingRight = source.PaddingRight},
+                {nameof(target.style.paddingBottom), target.style.paddingBottom = source.PaddingBottom},
+                {nameof(target.style.alignSelf), target.style.alignSelf = (Align) source.AlignSelf.value},
+                {nameof(target.style.unityTextAlign), target.style.unityTextAlign = (TextAnchor) source.UnityTextAlign.value},
+                {nameof(target.style.unityFontStyleAndWeight), target.style.unityFontStyleAndWeight = (FontStyle) source.UnityFontStyleAndWeight.value},
+                {nameof(target.style.fontSize), target.style.fontSize = source.FontSize},
+                {nameof(target.style.whiteSpace), target.style.whiteSpace = (WhiteSpace) source.WhiteSpace.value},
+                {nameof(target.style.color), target.style.color = source.Color},
+                {nameof(target.style.backgroundColor), target.style.backgroundColor = source.BackgroundColor},
+                {nameof(target.style.unityFont), target.style.unityFont = source.UnityFont},
+                {nameof(target.style.unityBackgroundScaleMode), target.style.unityBackgroundScaleMode = (ScaleMode) source.UnityBackgroundScaleMode.value},
+                {nameof(target.style.unityBackgroundImageTintColor), target.style.unityBackgroundImageTintColor = source.UnityBackgroundImageTintColor},
+                {nameof(target.style.alignItems), target.style.alignItems = (Align) source.AlignItems.value},
+                {nameof(target.style.alignContent), target.style.alignContent = (Align) source.AlignContent.value},
+                {nameof(target.style.justifyContent), target.style.justifyContent = (Justify) source.JustifyContent.value},
+                {nameof(target.style.borderLeftColor), target.style.borderLeftColor = source.BorderLeftColor},
+                {nameof(target.style.borderRightColor), target.style.borderRightColor = source.BorderRightColor},
+                {nameof(target.style.borderTopColor), target.style.borderTopColor = source.BorderTopColor},
+                {nameof(target.style.borderBottomColor), target.style.borderBottomColor = source.BorderBottomColor},
+                {nameof(target.style.borderLeftWidth), target.style.borderLeftWidth = source.BorderLeftWidth},
+                {nameof(target.style.borderRightWidth), target.style.borderRightWidth = source.BorderRightWidth},
+                {nameof(target.style.borderTopWidth), target.style.borderTopWidth = source.BorderTopWidth},
+                {nameof(target.style.borderBottomWidth), target.style.borderBottomWidth = source.BorderBottomWidth},
+                {nameof(target.style.borderTopLeftRadius), target.style.borderTopLeftRadius = source.BorderTopLeftRadius},
+                {nameof(target.style.borderTopRightRadius), target.style.borderTopRightRadius = source.BorderTopRightRadius},
+                {nameof(target.style.borderBottomLeftRadius), target.style.borderBottomLeftRadius = source.BorderBottomLeftRadius},
+                {nameof(target.style.borderBottomRightRadius), target.style.borderBottomRightRadius = source.BorderBottomRightRadius},
+                {nameof(target.style.opacity), target.style.opacity = source.Opacity.value},
+                {nameof(target.style.visibility), target.style.visibility = (Visibility) source.Visibility.value},
+                {nameof(target.style.display), target.style.display = (DisplayStyle) source.Display.value}
             };
             //styleValues.Add(nameof(target.style. ),target.style.left = source.left);
             //styleValues.Add(nameof(target.style. ),target.style.top = source.top);
@@ -1034,8 +1410,127 @@ namespace instance.id.EATK.Extensions
 
             return target;
         }
-
         #endregion
+
+        public static bool TryGetPreview(UnityObject target, out Texture2D preview)
+        {
+            preview = null;
+
+            if (target == null)
+                return false;
+
+            switch (target)
+            {
+                case GameObject go:
+                {
+                    var renderers = ListPool<Renderer>.New();
+
+                    try
+                    {
+                        go.GetComponentsInChildren(renderers);
+                        foreach (var renderer in renderers)
+                        {
+                            switch (renderer)
+                            {
+                                case MeshRenderer _:
+                                case SkinnedMeshRenderer _:
+                                    preview = AssetPreview.GetAssetPreview(target);
+                                    return true;
+                                case SpriteRenderer spriteRenderer when spriteRenderer.sprite != null:
+                                    preview = AssetPreview.GetAssetPreview(spriteRenderer.sprite);
+                                    return true;
+                            }
+                        }
+                    }
+                    finally
+                    {
+                        renderers.Free();
+                    }
+
+                    return false;
+                }
+                case Material _:
+                case Sprite _:
+                case Texture2D _:
+                    preview = AssetPreview.GetAssetPreview(target);
+                    return true;
+                default:
+                    return false;
+            }
+        }
+
+        public static IEnumerator GetAssetPreview(UnityObject asset, Action<Texture2D> callback)
+        {
+            // GetAssetPreview will start loading the preview, or return one if available
+            var texture = AssetPreview.GetAssetPreview(asset);
+
+            // If the preview is not available, IsLoadingAssetPreview will be true until loading has finished
+            while (AssetPreview.IsLoadingAssetPreview(asset.GetInstanceID()))
+            {
+                texture = AssetPreview.GetAssetPreview(asset);
+                yield return null;
+            }
+
+            // If loading a preview fails, fall back to the MiniThumbnail
+            if (!texture)
+                texture = AssetPreview.GetMiniThumbnail(asset);
+
+            callback(texture);
+        }
+
+        public static Texture2D TryGetPreview(UnityObject target)
+        {
+            Texture2D preview = null;
+            if (target == null)
+                return null;
+
+            // if ((preview = (Texture2D) AssetDatabase.GetCachedIcon(AssetDatabase.GetAssetPath(target.GetInstanceID()))) != null)
+            // {
+            //     return preview;
+            // }
+
+            switch (target)
+            {
+                case GameObject go:
+                {
+                    var renderers = ListPool<Renderer>.New();
+
+                    try
+                    {
+                        go.GetComponentsInChildren(renderers);
+                        foreach (var renderer in renderers)
+                        {
+                            switch (renderer)
+                            {
+                                case MeshRenderer _:
+                                case SkinnedMeshRenderer _:
+                                    // EditorCoroutineUtility.StartCoroutine(GetAssetPreview(target, texture => preview = texture), target);
+                                    preview = AssetPreview.GetAssetPreview(target);
+                                    return preview;
+                                case SpriteRenderer spriteRenderer when spriteRenderer.sprite != null:
+                                    // EditorCoroutineUtility.StartCoroutine(GetAssetPreview(spriteRenderer.sprite, texture => preview = texture), target);
+                                    preview = AssetPreview.GetAssetPreview(spriteRenderer.sprite);
+                                    return preview;
+                            }
+                        }
+                    }
+                    finally
+                    {
+                        renderers.Free();
+                    }
+
+                    return null;
+                }
+                case Material _:
+                case Sprite _:
+                case Texture2D _:
+                    // EditorCoroutineUtility.StartCoroutine(GetAssetPreview(target, texture => preview = texture), target);
+                    preview = AssetPreview.GetAssetPreview(target);
+                    return preview;
+                default:
+                    return null;
+            }
+        }
     }
 }
 #endif

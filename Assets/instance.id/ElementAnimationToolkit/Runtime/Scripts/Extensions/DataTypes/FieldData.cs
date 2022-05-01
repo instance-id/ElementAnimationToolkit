@@ -6,17 +6,39 @@ using UnityEngine;
 
 namespace instance.id.EATK.Extensions
 {
- 
     [Serializable]
-    public class FieldData<T> where T : Attribute, new()
+    public class FieldData<T> : FieldData where T : Attribute, new()
+    {
+        [SerializeField] public T attributeData;
+
+        public FieldData(FieldInfo fieldInfo) : base(fieldInfo)
+        {
+            CheckForAttributes(fieldInfo);
+        }
+
+        public FieldData() : base()
+        {
+            CheckForAttributes(fieldInfo);
+        }
+
+        private void CheckForAttributes(FieldInfo fieldInfo)
+        {
+            var catAttrib = (T)Attribute.GetCustomAttribute(fieldInfo ?? throw new ArgumentNullException(nameof(fieldInfo)), typeof(T));
+            attributeData = catAttrib ?? new T();
+        }
+    }
+
+    [Serializable]
+    public class FieldData
     {
         public Type fieldType;
         public FieldInfo fieldInfo;
-        [SerializeField] public T attributeData;
         [SerializeField] public string name;
         [SerializeField] public string fieldTypeString;
         [SerializeField] public List<string> fieldTypeParametersString;
         [SerializeField] public List<Type> fieldTypeParameters;
+
+        public FieldData() { }
 
         public FieldData(FieldInfo fieldInfo)
         {
@@ -33,14 +55,6 @@ namespace instance.id.EATK.Extensions
                 .GetGenericArguments()
                 .Select(x => x.Name.ToString())
                 .ToList();
-
-            CheckForAttributes(fieldInfo);
-        }
-
-        private void CheckForAttributes(FieldInfo fieldInfo)
-        {
-            var catAttrib =  (T) Attribute.GetCustomAttribute(fieldInfo ?? throw new ArgumentNullException(nameof(fieldInfo)), typeof(T));
-            attributeData = catAttrib ?? new T();
         }
     }
 }

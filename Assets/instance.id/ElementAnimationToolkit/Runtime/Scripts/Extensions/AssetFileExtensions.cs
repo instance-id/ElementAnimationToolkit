@@ -327,7 +327,7 @@ namespace instance.id.EATK.Extensions
 
                 // -------------------------------------------------------
                 // -- Dynamically added context menus per element --------
-                additionalMenus?.ForEach(x => // @formatter:off
+                additionalMenus?.forEach(x => // @formatter:off
                 {
                     evt.menu.AppendAction(x.Key, CallActionMenu,
                         a => DropdownMenuAction.Status.Normal, x.Value);

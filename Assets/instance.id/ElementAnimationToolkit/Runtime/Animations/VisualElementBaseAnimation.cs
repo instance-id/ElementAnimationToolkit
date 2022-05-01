@@ -15,7 +15,6 @@ namespace instance.id.EATK
     public static class VisualElementBaseAnimation
     {
         #region Base Animation Extensions
-
         // --------------------------------------- @AnimateBackgroundColor
         // ---------------------------------------------------------------
         /// <summary>
@@ -32,7 +31,7 @@ namespace instance.id.EATK
         {
             if (easing == null) easing = Easy.EaseInOutQuint;
             return target.experimental.animation
-                .Start(new StyleValues { backgroundColor = startColor }, new StyleValues { backgroundColor = endColor }, durationMs)
+                .Start(new StyleValues {backgroundColor = startColor}, new StyleValues {backgroundColor = endColor}, durationMs)
                 .Ease(easing)
                 .OnCompleted(callback);
         }
@@ -56,7 +55,7 @@ namespace instance.id.EATK
             target.parent.schedule.Execute(() =>
             {
                 anim = target.experimental.animation
-                    .Start(new StyleValues { backgroundColor = startColor }, new StyleValues { backgroundColor = endColor }, durationMs)
+                    .Start(new StyleValues {backgroundColor = startColor}, new StyleValues {backgroundColor = endColor}, durationMs)
                     .Ease(easing)
                     .OnCompleted(callback);
             }).StartingIn(delayMs);
@@ -92,7 +91,7 @@ namespace instance.id.EATK
         {
             if (easing == null) easing = Easy.EaseInOutQuint;
             return target.experimental.animation
-                .Start(new StyleValues { borderColor = startColor }, new StyleValues { borderColor = endColor }, durationMs)
+                .Start(new StyleValues {borderColor = startColor}, new StyleValues {borderColor = endColor}, durationMs)
                 .Ease(easing)
                 .OnCompleted(callback);
         }
@@ -126,7 +125,7 @@ namespace instance.id.EATK
         {
             if (easing == null) easing = Easy.EaseInOutQuint;
             return target.experimental.animation
-                .Start(new StyleValues { color = startColor }, new StyleValues { color = endColor }, durationMs)
+                .Start(new StyleValues {color = startColor}, new StyleValues {color = endColor}, durationMs)
                 .Ease(easing)
                 .OnCompleted(callback);
         }
@@ -160,7 +159,7 @@ namespace instance.id.EATK
         {
             if (easing == null) easing = Easy.EaseInOutQuint;
             return target.experimental.animation
-                .Start(new StyleValues { unityBackgroundImageTintColor = startColor }, new StyleValues { unityBackgroundImageTintColor = endColor }, durationMs)
+                .Start(new StyleValues {unityBackgroundImageTintColor = startColor}, new StyleValues {unityBackgroundImageTintColor = endColor}, durationMs)
                 .Ease(easing)
                 .OnCompleted(callback);
         }
@@ -189,15 +188,21 @@ namespace instance.id.EATK
         /// <param name="durationMs">The length of time in which the animation will occur(in milliseconds)</param>
         /// <param name="callback">Function that can be called when the animation is completed</param>
         /// <param name="easing">Controls the animation timing curve mathematically</param>
+        /// <param name="reanimate">If enabled, animation can trigger from start value regardless of current opacity value</param>
         public static ValueAnimation<StyleValues> AnimateOpacity(this VisualElement target, float startOpacity, float endOpacity, int durationMs, Action callback = null,
-        Func<float, float> easing = null)
+        Func<float, float> easing = null, bool reanimate = false)
         {
+            if (!reanimate)
+            {
+                if (target.style.opacity == endOpacity) return null;
+            }
+
             if (startOpacity == 0) startOpacity = 0.Zero();
             if (endOpacity == 0) endOpacity = 0.Zero();
 
             if (easing == null) easing = Easy.EaseInOutQuint;
             return target.experimental.animation
-                .Start(new StyleValues { opacity = startOpacity }, new StyleValues { opacity = endOpacity }, durationMs)
+                .Start(new StyleValues {opacity = startOpacity}, new StyleValues {opacity = endOpacity}, durationMs)
                 .Ease(easing)
                 .OnCompleted(callback);
         }
@@ -224,12 +229,58 @@ namespace instance.id.EATK
             target.parent.schedule.Execute(() =>
             {
                 anim = target.experimental.animation
-                    .Start(new StyleValues { opacity = startOpacity }, new StyleValues { opacity = endOpacity }, durationMs)
+                    .Start(new StyleValues {opacity = startOpacity}, new StyleValues {opacity = endOpacity}, durationMs)
                     .Ease(easing)
                     .OnCompleted(callback);
             }).StartingIn(delayMs);
 
             return anim;
+        }
+
+        // ----------------------------------------------- @AnimateOpacity
+        // ---------------------------------------------------------------
+        /// <summary>
+        /// Enable Display of an element and animate it's opacity
+        /// </summary>
+        /// <param name="target">VisualElement to animate</param>
+        /// <param name="setDisplay">Bool value representing the desired display state of the element</param>
+        /// <param name="durationMs">The length of time in which the animation will occur(in milliseconds)</param>
+        /// <param name="callback">Function that can be called when the animation is completed</param>
+        /// <param name="easing">Controls the animation timing curve mathematically</param>
+        public static ValueAnimation<StyleValues> AnimateDisplay(this VisualElement target, bool setDisplay, int durationMs, Action callback = null,
+        Func<float, float> easing = null)
+        {
+            switch (setDisplay)
+            {
+                case true when target.GetDisplay():
+                case false when !target.GetDisplay():
+                    return default;
+            }
+
+            float startOpacity;
+            float endOpacity;
+
+            if (setDisplay)
+            {
+                startOpacity = 0.Zero();
+                endOpacity = 1;
+                target.SetOpacity(startOpacity);
+                target.SetDisplay(true);
+            }
+            else
+            {
+                startOpacity = 1;
+                endOpacity = 0.Zero();
+                target.SetOpacity(startOpacity);
+                if (callback == null) 
+                    callback = () => target.SetDisplay(false);
+            }
+
+            if (easing == null) easing = Easy.EaseInOutQuint;
+            return target.experimental.animation
+                .Start(new StyleValues {opacity = startOpacity}, new StyleValues {opacity = endOpacity}, durationMs)
+                .Ease(easing)
+                .OnCompleted(callback);
         }
 
         // ------------------------------------------------- @AnimateWidth
@@ -248,9 +299,25 @@ namespace instance.id.EATK
         {
             if (easing == null) easing = Easy.EaseInOutQuint;
             return target.experimental.animation
-                .Start(new StyleValues { width = startWidth }, new StyleValues { width = endWidth }, durationMs)
+                .Start(new StyleValues {width = startWidth}, new StyleValues {width = endWidth}, durationMs)
                 .Ease(easing)
                 .OnCompleted(callback);
+        }
+
+        public static ValueAnimation<StyleValues> AnimateWidthDelayed(this VisualElement target, float startWidth, float endWidth, int durationMs, int delayMs, Action callback = null,
+        Func<float, float> easing = null)
+        {
+            ValueAnimation<StyleValues> anim = new ValueAnimation<StyleValues>();
+            if (easing == null) easing = Easy.EaseInOutQuint;
+
+            target.parent.schedule.Execute(() =>
+            {
+                anim = target.experimental.animation
+                    .Start(new StyleValues {width = startWidth}, new StyleValues {width = endWidth}, durationMs)
+                    .Ease(easing)
+                    .OnCompleted(callback);
+            }).StartingIn(delayMs);
+            return anim;
         }
 
         // ------------------------------------------------ @AnimateHeight
@@ -269,11 +336,56 @@ namespace instance.id.EATK
         {
             if (easing == null) easing = Easy.EaseInOutQuint;
             return target.experimental.animation
-                .Start(new StyleValues { height = startHeight }, new StyleValues { height = endHeight }, durationMs)
+                .Start(new StyleValues {height = startHeight}, new StyleValues {height = endHeight}, durationMs)
                 .Ease(easing)
                 .OnCompleted(callback);
         }
 
+        public static ValueAnimation<StyleValues> AnimateHeightDelayed(this VisualElement target, float startHeight, float endHeight, int durationMs, int delayMs, Action callback = null,
+        Func<float, float> easing = null)
+        {
+            ValueAnimation<StyleValues> anim = new ValueAnimation<StyleValues>();
+            if (easing == null) easing = Easy.EaseInOutQuint;
+            target.parent.schedule.Execute(() =>
+            {
+                anim = target.experimental.animation
+                    .Start(new StyleValues {height = startHeight}, new StyleValues {height = endHeight}, durationMs)
+                    .Ease(easing)
+                    .OnCompleted(callback);
+            }).StartingIn(delayMs);
+            return anim;
+        }
+
+        /// <summary>
+        /// Animate an arbitrary float value
+        /// </summary>
+        /// <param name="target"></param>
+        /// <param name="startValue"></param>
+        /// <param name="endValue"></param>
+        /// <param name="durationMs"></param>
+        /// <param name="valueChange"></param>
+        /// <param name="callback"></param>
+        /// <param name="easing"></param>
+        /// <returns></returns>
+        public static ValueAnimation<float> AnimateValue(this VisualElement target, float startValue, float endValue, int durationMs, Action<VisualElement, float> valueChange = null, Action callback = null,
+        Func<float, float> easing = null)
+        {
+            if (easing == null) easing = Easy.EaseInOutQuint;
+            return target.experimental.animation
+                .Start(startValue, endValue, durationMs, valueChange)
+                .Ease(easing)
+                .OnCompleted(callback);
+        }
+
+        public static ValueAnimation<float> AnimateSlider(this Slider target, float startValue, float endValue, int durationMs, Action<VisualElement, float> valueChange = null, Action callback = null,
+        Func<float, float> easing = null)
+        {
+            if (easing == null) easing = Easy.EaseInOutQuint;
+            return target.experimental.animation
+                .Start(startValue, endValue, durationMs, valueChange)
+                .Ease(easing)
+                .OnCompleted(callback);
+        }
         #endregion
     }
 }

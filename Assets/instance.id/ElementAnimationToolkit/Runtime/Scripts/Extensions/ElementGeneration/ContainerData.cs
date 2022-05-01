@@ -2,6 +2,9 @@ using UnityEngine.UIElements;
 
 namespace instance.id.EATK.Extensions
 {
+    /// <summary>
+    /// Contains the objects needed to generate editor window elements 
+    /// </summary>
     public class ContainerData
     {
         public ContainerStyle containerType;

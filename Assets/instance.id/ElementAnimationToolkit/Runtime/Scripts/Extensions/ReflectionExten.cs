@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace instance.id.EATK.Extensions
 {
-    public static class ReflectionExtensions
+    public static class ReflectionExten
     {
         /// <summary>
         /// Get attributes from a class
@@ -24,8 +24,8 @@ namespace instance.id.EATK.Extensions
                 foreach (var field in thisType.GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic))
                 {
                     if (!(field.GetCustomAttributes(typeof(T), true).FirstOrDefault() is T att)) continue;
-                    classData.fieldDatas.TryAddValue(field.Name, new FieldData<T>(field));
-                    classData.fieldList.TryAddValue(classData.fieldDatas[field.Name].attributeData);
+                    classData.fieldDatas.TryAdd(field.Name, new FieldData<T>(field));
+                    classData.fieldList.TryAdd(classData.fieldDatas[field.Name].attributeData);
                 }
             }
             catch (Exception e) { Debug.LogException(e); }

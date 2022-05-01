@@ -2,6 +2,7 @@
 // -- Project : https://github.com/instance-id/ElementAnimationToolkit       --
 // -- instance.id 2020 | http://github.com/instance-id | http://instance.id  --
 // ----------------------------------------------------------------------------
+
 #if UNITY_EDITOR
 using System;
 using instance.id.EATK.Extensions;
@@ -21,7 +22,7 @@ namespace instance.id.EATK
         public Expander expander;
         private bool m_Value;
         private bool isAnimating;
-        public Action stateChange = () => {};
+        public Action stateChange = () => { };
 
         /// <summary>
         ///   <para>USS class name of elements of this type.</para>
@@ -42,7 +43,18 @@ namespace instance.id.EATK
         ///   <para>USS class name of expander element in a AnimatedFoldout.</para>
         /// </summary>
         public static readonly string expanderUssClassName = ussClassName + "__expander";
-       
+
+        private string toggleLabelUssClass;
+        public string ToggleLabelUssClass
+        {
+            get => toggleLabelUssClass;
+            set
+            {
+                toggleLabelUssClass = value;
+                m_Toggle.Query<Label>().First().AddToClassList(toggleLabelUssClass);
+            }
+        }
+
         /// <summary>
         /// The container element that holds the AnimatedFoldout's child objects
         /// </summary>
@@ -69,6 +81,7 @@ namespace instance.id.EATK
                     SetValueWithoutNotify(value);
                     SendEvent(pooled);
                 }
+
                 stateChange.Invoke();
             }
         }
@@ -79,13 +92,16 @@ namespace instance.id.EATK
             m_Toggle.value = m_Value;
         }
 
-        public AnimatedFoldout()
+        public AnimatedFoldout() => BuildFoldout();
+        public AnimatedFoldout(VisualElement headerElement, FlexDirection direction = FlexDirection.Column, Align alignSelf = default) => BuildFoldout(headerElement, direction, alignSelf);
+
+        private void BuildFoldout(VisualElement headerElement = default, FlexDirection direction = FlexDirection.Column, Align alignSelf = default)
         {
             m_Value = true;
             AddToClassList(ussClassName);
             new Expander().Create(out expander).ToUSS(nameof(expander));
 
-            new Toggle {value = true}.Create(out m_Toggle).ToUSS(toggleUssClassName)
+            new Toggle { value = true }.Create(out m_Toggle).ToUSS(toggleUssClassName)
                 .RegisterValueChangedCallback(evt =>
                 {
                     value = m_Toggle.value;
@@ -94,6 +110,14 @@ namespace instance.id.EATK
                 });
 
             hierarchy.Add(m_Toggle);
+            if (headerElement != default)
+            {
+                m_Toggle.Add(headerElement);
+                m_Toggle.Query("unity-checkmark").First().parent.style.flexGrow = 0;
+                if (alignSelf != default) m_Toggle.style.alignSelf = alignSelf;
+                if (direction != FlexDirection.Column) style.flexDirection = direction;
+            }
+
             new VisualElement().Create(out m_Container, "unity-content").ToUSS(contentUssClassName);
             expander.AddToExpansionGroup(m_Container);
             hierarchy.Add(expander);
@@ -110,6 +134,11 @@ namespace instance.id.EATK
             this.Query("unity-checkmark").First().style.alignSelf = Align.Center;
         }
 
+        public VisualElement SetLabelClass(string ussClass)
+        {
+            return this;
+        }
+
         private void SetPickingMode(bool animating)
         {
             m_Toggle.style.opacity = 1;
@@ -123,7 +152,7 @@ namespace instance.id.EATK
         /// Manually trigger expansion or collapse of the expansion group via parameter
         /// </summary>
         /// <param name="rootElement">The root visual element of the binding object</param>
-        public void ActivateOnStart(VisualElement rootElement) => 
+        public void ActivateOnStart(VisualElement rootElement) =>
             rootElement.RegisterCallback<GeometryChangedEvent>(evt => DoActivationOnStart(evt, rootElement));
 
         // -- Callback will call this once the editor is ready, but just before displaying, so there is no visual "pop"
@@ -157,9 +186,7 @@ namespace instance.id.EATK
         /// <summary>
         ///   <para>Instantiates an AnimatedFoldout using the data read from a UXML file.</para>
         /// </summary>
-        public new class UxmlFactory : UxmlFactory<AnimatedFoldout, UxmlTraits>
-        {
-        }
+        public new class UxmlFactory : UxmlFactory<AnimatedFoldout, UxmlTraits> { }
 
         public new class UxmlTraits : BindableElement.UxmlTraits
         {

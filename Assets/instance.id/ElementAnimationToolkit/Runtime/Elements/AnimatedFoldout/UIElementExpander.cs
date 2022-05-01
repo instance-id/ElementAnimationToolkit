@@ -86,17 +86,17 @@ namespace instance.id.EATK
         {
             expandContainerItems.Add(element);
         }
-
-        public void TriggerExpanderResize(ChangeEvent<bool> eventValue)
-        {
-            ExpandContainerValueChanges(eventValue);
-        }
-
+        
         /// <summary>
         /// Trigger the expansion container to resize. Needed when child elements change size.
         /// </summary>
         /// <param name="eventValue">Default is true, which will make the container resize. If false, container will animate closed</param>
         public void TriggerExpanderResize(bool eventValue = true)
+        {
+            ExpandContainerValueChanges(eventValue);
+        }
+        
+        public void TriggerExpanderResize(ChangeEvent<bool> eventValue)
         {
             ExpandContainerValueChanges(eventValue);
         }
