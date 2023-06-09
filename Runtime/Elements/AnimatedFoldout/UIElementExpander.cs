@@ -3,8 +3,8 @@
 // -- instance.id 2020 | http://github.com/instance-id | http://instance.id  --
 // ----------------------------------------------------------------------------
 
+#if UNITY_EDITOR
 using System;
-using instance.id.EATK;
 using JetBrains.Annotations;
 using UnityEngine.UIElements;
 using UnityEngine.UIElements.Experimental;
@@ -14,10 +14,11 @@ namespace instance.id.EATK
     public class Expander : VisualElement
     {
         ValueAnimation<StyleValues> foldoutAnimation;
-        private readonly Toggle expandToggle;
+        private readonly Toggle expandTrigger;
         private readonly VisualElement expandContainerItems;
         public VisualElement shownItem;
-        [CanBeNull] public Action expandTrigger;
+        [CanBeNull] public Action expandTriggerAction;
+        public Action onComplete;
         private int tmpAnimTime = 0;
 
         public bool startExpanded { get; set; } = false;
@@ -36,28 +37,42 @@ namespace instance.id.EATK
 
         public int animationTime
         {
-            get => firstStart ? tmpAnimTime : m_AnimationTime;
-            [UsedImplicitly] set => m_AnimationTime = value;
+            get => m_AnimationTime;
+            set => m_AnimationTime = value;
+        }
+
+        public bool Animate
+        {
+            get => animate; 
+            set => animate = value;
         }
 
         public Expander()
         {
-            expandToggle = new Toggle { style = { display = DisplayStyle.None }, name = "ExpandToggle" };
-            expandToggle.RegisterValueChangedCallback(ExpandContainerValueChanges);
+            expandTrigger = new Toggle {style = {display = DisplayStyle.None}, name = "ExpandTrigger"};
+            expandTrigger.RegisterValueChangedCallback(ExpandContainerValueChanges);
 
             expandContainerItems = new VisualElement
             {
                 name = "expandContainer",
-                style = { overflow = Overflow.Hidden }
+                style = {overflow = Overflow.Hidden}
             };
+
             expandContainerItems.AddToClassList("expandContainer");
             expandContainerItems.Add(shownItem);
 
-            Add(expandToggle);
+            Add(expandTrigger);
             Add(expandContainerItems);
             Add(shownItem);
 
             expandContainerItems.style.display = DisplayStyle.None;
+            expandContainerItems.RegisterCallback<GeometryChangedEvent>(DeferredAction);
+        }
+
+        private void DeferredAction(GeometryChangedEvent evt)
+        {
+            expandContainerItems.UnregisterCallback<GeometryChangedEvent>(DeferredAction);
+            this.Query<VisualElement>(className: "unity-foldout__content").First().style.flexGrow = 0;
         }
 
         /// <summary>
@@ -65,7 +80,7 @@ namespace instance.id.EATK
         /// </summary>
         public void Activate()
         {
-            expandToggle.value = !expandToggle.value;
+            expandTrigger.value = !expandTrigger.value;
         }
 
         /// <summary>
@@ -74,8 +89,7 @@ namespace instance.id.EATK
         /// <param name="value">Expands on true, collapses on false</param>
         public void Activate(bool value)
         {
-            // IsAnimating = true;
-            expandToggle.value = value;
+            expandTrigger.value = value;
         }
 
         /// <summary>
@@ -86,7 +100,7 @@ namespace instance.id.EATK
         {
             expandContainerItems.Add(element);
         }
-        
+
         /// <summary>
         /// Trigger the expansion container to resize. Needed when child elements change size.
         /// </summary>
@@ -95,7 +109,7 @@ namespace instance.id.EATK
         {
             ExpandContainerValueChanges(eventValue);
         }
-        
+
         public void TriggerExpanderResize(ChangeEvent<bool> eventValue)
         {
             ExpandContainerValueChanges(eventValue);
@@ -113,12 +127,19 @@ namespace instance.id.EATK
         private void AnimationComplete()
         {
             IsAnimating = false;
+            onComplete?.Invoke();
+        }
+
+        public void SetExpanderAuto()
+        {
+            expandContainerItems.style.height = StyleKeyword.Auto;
         }
 
         private void ExpandContainerValueChanges(ChangeEvent<bool> evt)
         {
             if (style.display == DisplayStyle.None) style.display = DisplayStyle.Flex;
-            if (expandContainerItems.style.display == DisplayStyle.None) expandContainerItems.style.display = DisplayStyle.Flex;
+            if (expandContainerItems.style.display == DisplayStyle.None)
+                expandContainerItems.style.display = DisplayStyle.Flex;
 
             if (foldoutAnimation != null)
             {
@@ -139,15 +160,19 @@ namespace instance.id.EATK
                     expandContainerItems.style.display = DisplayStyle.None;
                 }
 
-                IsAnimating = true;
-                foldoutAnimation =
-                    expandContainerItems.experimental.animation.Start(new StyleValues
-                        {
-                            height = expandContainerItems.layout.height
-                        }, new StyleValues { height = 0 }, animationTime)
-                        .Ease(Easy.EaseInOutQuint)
-                        .OnCompleted(HideContents);
-                foldoutAnimation.KeepAlive();
+                if (animate)
+                {
+                    IsAnimating = true;
+                    foldoutAnimation =
+                        expandContainerItems.experimental.animation.Start(new StyleValues
+                            {
+                                height = expandContainerItems.layout.height
+                            }, new StyleValues {height = 0}, animationTime)
+                            .Ease(Easy.EaseInOutQuint)
+                            .OnCompleted(HideContents);
+                    foldoutAnimation.KeepAlive();
+                }
+                else HideContents();
             }
         }
 
@@ -169,29 +194,39 @@ namespace instance.id.EATK
             }
             else
             {
-                IsAnimating = true;
-                foldoutAnimation =
-                    expandContainerItems.experimental.animation
-                        .Start(new StyleValues { height = expandContainerItems.layout.height }, new StyleValues { height = 0 }, firstStart ? tmpAnimTime : m_AnimationTime)
-                        .Ease(Easy.EaseInOutQuint)
-                        .OnCompleted(AnimationComplete);
-                foldoutAnimation.KeepAlive();
+                if (animate)
+                {
+                    IsAnimating = true;
+                    foldoutAnimation =
+                        expandContainerItems.experimental.animation
+                            .Start(new StyleValues {height = expandContainerItems.layout.height}, new StyleValues {height = 0}, firstStart ? tmpAnimTime : m_AnimationTime)
+                            .Ease(Easy.EaseInOutQuint)
+                            .OnCompleted(AnimationComplete);
+                    foldoutAnimation.KeepAlive();
+                }
+                else expandContainerItems.style.height = 0;
             }
         }
 
+        private bool animate = true;
         private void OnGeometryChangedEvent(GeometryChangedEvent evt)
         {
-            IsAnimating = true;
-            foldoutAnimation =
-                expandContainerItems.experimental.animation
-                    .Start(new StyleValues { height = evt.oldRect.height }, new StyleValues { height = evt.newRect.height }, firstStart ? tmpAnimTime : m_AnimationTime)
-                    .Ease(Easy.EaseInOutQuint)
-                    .OnCompleted(AnimationComplete);
+            if (animate)
+            {
+                IsAnimating = true;
+                foldoutAnimation =
+                    expandContainerItems.experimental.animation
+                        .Start(new StyleValues {height = evt.oldRect.height}, new StyleValues {height = evt.newRect.height}, firstStart ? tmpAnimTime : m_AnimationTime)
+                        .Ease(Easy.EaseInOutQuint)
+                        .OnCompleted(AnimationComplete);
 
-            expandContainerItems.style.height = evt.oldRect.height;
+                expandContainerItems.style.height = evt.oldRect.height;
+                foldoutAnimation.KeepAlive();
+            }
+            else expandContainerItems.style.height = evt.newRect.height;
 
-            foldoutAnimation.KeepAlive();
             expandContainerItems.UnregisterCallback<GeometryChangedEvent>(OnGeometryChangedEvent);
         }
     }
 }
+#endif

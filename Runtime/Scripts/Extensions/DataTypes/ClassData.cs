@@ -8,7 +8,7 @@ namespace instance.id.EATK.Extensions
     public class ClassData<T> : ClassData where T : Attribute, new()
     {
         [SerializeField] public List<T> fieldList = new List<T>();
-        public Dictionary<string, FieldData<T>> fieldDatas = new Dictionary<string, FieldData<T>>();
+        public new Dictionary<string, FieldData<T>> fieldDatas = new Dictionary<string, FieldData<T>>();
 
         public ClassData(Type type) : base(type) { }
     }

@@ -327,6 +327,12 @@ namespace instance.id.EATK.Extensions
 
         public static StyleEnum<T> ToStyleEnum<T>(string str) where T : struct, IConvertible => new StyleEnum<T>
             { value = (T)Enum.Parse(typeof(T), MapCssName(str.Replace(" ", "")), true) };
+
+        public static float TryParseFloat(this string str)
+        {
+            float.TryParse(str, out float result);
+            return result;
+        }
     }
 }
 

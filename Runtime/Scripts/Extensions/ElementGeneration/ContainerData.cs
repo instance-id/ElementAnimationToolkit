@@ -7,19 +7,23 @@ namespace instance.id.EATK.Extensions
     /// </summary>
     public class ContainerData
     {
-        public ContainerStyle containerType;
+        public ContainerType containerType;
         public VisualElement element;
+        public string containerClass;
         public string containerName;
         public int containerId;
+        public bool foldoutOpen;
         public int order;
     }
 
     public struct ContainerDatas
     {
-        public ContainerStyle containerType;
+        public ContainerType containerType;
         public VisualElement element;
+        public string containerClass;
         public string containerName;
         public int containerId;
+        public bool closed;
         public int order;
     }
 }

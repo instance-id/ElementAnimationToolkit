@@ -19,16 +19,18 @@ namespace instance.id.EATK.Extensions
     public static class AssetFileExtensions
     {
         private static string searchStr = "a:all t:";
+
         public static StyleSheet GetStyleSheet(this Type type, string name = default, bool suffix = false, bool debug = false)
         {
             var sheetName = name == default && !suffix ? type.Name : suffix ? $"{type.Name}{name}" : name;
             var str = $"{searchStr}StyleSheet {sheetName}";
             if (debug) Debug.Log($"ScriptDir: {type.GetScriptPath()} {type.GetScriptPath() + $"/Style/{sheetName}Style.uss"}");
 
-            var sheet =  AssetDatabase.LoadAssetAtPath<StyleSheet>(type.GetScriptPath() + $"/Style/{sheetName}.uss");
-            if (sheet == null) sheet =  AssetDatabase.FindAssets(str)
-                .Select(guid => AssetDatabase.LoadAssetAtPath<StyleSheet>(AssetDatabase.GUIDToAssetPath(guid)))
-                .ToList().FirstOrDefault();
+            var sheet = AssetDatabase.LoadAssetAtPath<StyleSheet>(type.GetScriptPath() + $"/Style/{sheetName}.uss");
+            if (sheet == null)
+                sheet = AssetDatabase.FindAssets(str)
+                    .Select(guid => AssetDatabase.LoadAssetAtPath<StyleSheet>(AssetDatabase.GUIDToAssetPath(guid)))
+                    .ToList().FirstOrDefault();
             return sheet;
         }
 
@@ -73,12 +75,12 @@ namespace instance.id.EATK.Extensions
                 .Select(guid => AssetDatabase.LoadAssetAtPath<T>(AssetDatabase.GUIDToAssetPath(guid)))
                 .FirstOrDefault();
         }
-        
+
         public static string GetScriptPath(this object obj, [CallerFilePath] string sourceFilePath = "")
         {
             return new Uri(Application.dataPath).MakeRelativeUri(new Uri(sourceFilePath)).ToString();
         }
-        
+
         /// <summary>
         /// Locates the requested script file by type and searches the file for the locator string. If found, the line number is captured.
         /// Then returns the script file as Type of Object and the line number as an out parameter.
@@ -196,7 +198,7 @@ namespace instance.id.EATK.Extensions
             lineNum = fullPath.LocateLineNumber(locator);
             return scriptFile;
         }
-        
+
         /// <summary>
         /// Locate the local path of a script file
         /// </summary>
@@ -247,8 +249,8 @@ namespace instance.id.EATK.Extensions
 
             return AssetDatabase.GUIDToAssetPath(guidValue);
         }
-        
-      // -- UIElement extension that lets you jump straight ------------
+
+        // -- UIElement extension that lets you jump straight ------------
         // -- to the line of code in which this method is used -----------
         /// <summary>
         /// From an elements context menu, jump straight to a specific line of code in your IDE
@@ -263,9 +265,9 @@ namespace instance.id.EATK.Extensions
         /// <param name="externalKeyword"></param>
         /// <param name="path">The directory location in which the code file exists. Notes, when variable is omitted, this path is found automatically via reflection</param>
         public static void JumpToCode(this VisualElement element, string locator = default, bool externalKeyword = false, string menuItemLabel = default,
-            string menuItemUSSLabel = default,
-            Type type = null, [CallerFilePath] string path = "", bool jumpUSS = false, bool jumpAnimation = false, Dictionary<string, Action> additionalMenus = null,
-            List<JumpTarget> jumpTargets = null)
+        string menuItemUSSLabel = default,
+        Type type = null, [CallerFilePath] string path = "", bool jumpUSS = false, bool jumpAnimation = false, Dictionary<string, Action> additionalMenus = null,
+        List<JumpTarget> jumpTargets = null)
         {
             element.AddManipulator(new ContextualMenuManipulator(evt =>
             {
@@ -394,6 +396,25 @@ namespace instance.id.EATK.Extensions
         public static bool ToIDE(this Object asset, int lineNumber = -1)
         {
             return AssetDatabase.OpenAsset(asset, lineNumber);
+        }
+
+        public static List<TAssets> FindAssets<TAssets>(this Object asset, string query = null) where TAssets : Object
+        {
+            return FindAssets<TAssets>();
+        }
+        
+        public static List<TAssets> FindAssets<TAssets>(string query = null) where TAssets : Object
+        {
+            List<TAssets> results = new List<TAssets>();
+            var queryString = query != null ? $"a:all t:{typeof(TAssets).Name} {query}" : $"a:all t:{typeof(TAssets).Name}";
+
+#if UNITY_EDITOR
+            results = AssetDatabase.FindAssets(queryString)
+                .Select(guid => AssetDatabase.LoadAssetAtPath<TAssets>(AssetDatabase.GUIDToAssetPath(guid)))
+                .ToList();
+            if (results.Count == 0) Debug.Log($"No Assets found of type: {typeof(TAssets)}");
+#endif
+            return results;
         }
     }
 }
