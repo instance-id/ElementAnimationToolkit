@@ -1,0 +1,76 @@
+namespace instance.id.EATK
+{
+    public enum AnimateElement
+    {
+        Custom = -2,  // 0xFFFFFFFE
+        Unknown = -1, // 0xFFFFFFFF
+        Color = 0,
+        FontSize = 1,
+        UnityFont = 2,
+        UnityFontStyleAndWeight = 3,
+        UnityTextAlign = 4,
+        Visibility = 5,
+        WhiteSpace = 6,
+        AlignContent = 65536,                  // 0x00010000
+        AlignItems = 65537,                    // 0x00010001
+        AlignSelf = 65538,                     // 0x00010002
+        BackgroundColor = 65539,               // 0x00010003
+        BackgroundImage = 65540,               // 0x00010004
+        BorderBottomColor = 65541,             // 0x00010005
+        BorderBottomLeftRadius = 65542,        // 0x00010006
+        BorderBottomRightRadius = 65543,       // 0x00010007
+        BorderBottomWidth = 65544,             // 0x00010008
+        BorderLeftColor = 65545,               // 0x00010009
+        BorderLeftWidth = 65546,               // 0x0001000A
+        BorderRightColor = 65547,              // 0x0001000B
+        BorderRightWidth = 65548,              // 0x0001000C
+        BorderTopColor = 65549,                // 0x0001000D
+        BorderTopLeftRadius = 65550,           // 0x0001000E
+        BorderTopRightRadius = 65551,          // 0x0001000F
+        BorderTopWidth = 65552,                // 0x00010010
+        Bottom = 65553,                        // 0x00010011
+        Cursor = 65554,                        // 0x00010012
+        Display = 65555,                       // 0x00010013
+        FlexBasis = 65556,                     // 0x00010014
+        FlexDirection = 65557,                 // 0x00010015
+        FlexGrow = 65558,                      // 0x00010016
+        FlexShrink = 65559,                    // 0x00010017
+        FlexWrap = 65560,                      // 0x00010018
+        Height = 65561,                        // 0x00010019
+        JustifyContent = 65562,                // 0x0001001A
+        Left = 65563,                          // 0x0001001B
+        MarginBottom = 65564,                  // 0x0001001C
+        MarginLeft = 65565,                    // 0x0001001D
+        MarginRight = 65566,                   // 0x0001001E
+        MarginTop = 65567,                     // 0x0001001F
+        MaxHeight = 65568,                     // 0x00010020
+        MaxWidth = 65569,                      // 0x00010021
+        MinHeight = 65570,                     // 0x00010022
+        MinWidth = 65571,                      // 0x00010023
+        Opacity = 65572,                       // 0x00010024
+        Overflow = 65573,                      // 0x00010025
+        PaddingBottom = 65574,                 // 0x00010026
+        PaddingLeft = 65575,                   // 0x00010027
+        PaddingRight = 65576,                  // 0x00010028
+        PaddingTop = 65577,                    // 0x00010029
+        Position = 65578,                      // 0x0001002A
+        Right = 65579,                         // 0x0001002B
+        TextOverflow = 65580,                  // 0x0001002C
+        Top = 65581,                           // 0x0001002D
+        UnityBackgroundImageTintColor = 65582, // 0x0001002E
+        UnityBackgroundScaleMode = 65583,      // 0x0001002F
+        UnityOverflowClipBox = 65584,          // 0x00010030
+        UnitySliceBottom = 65585,              // 0x00010031
+        UnitySliceLeft = 65586,                // 0x00010032
+        UnitySliceRight = 65587,               // 0x00010033
+        UnitySliceTop = 65588,                 // 0x00010034
+        UnityTextOverflowPosition = 65589,     // 0x00010035
+        Width = 65590,                         // 0x00010036
+        BorderColor = 131072,                  // 0x00020000
+        BorderRadius = 131073,                 // 0x00020001
+        BorderWidth = 131074,                  // 0x00020002
+        Flex = 131075,                         // 0x00020003
+        Margin = 131076,                       // 0x00020004
+        Padding = 131077,                      // 0x00020005
+    }
+}

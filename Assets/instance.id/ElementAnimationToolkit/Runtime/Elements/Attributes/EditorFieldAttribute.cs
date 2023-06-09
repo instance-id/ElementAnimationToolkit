@@ -8,7 +8,7 @@ namespace instance.id.EATK.Extensions
     /// <summary>
     /// Attribute providing easier creation of custom internal editor windows
     /// </summary>
-    [Serializable, AttributeUsage(AttributeTargets.Field)]
+    [Serializable, AttributeUsage(AttributeTargets.Field | AttributeTargets.Interface)]
     public class EditorFieldAttribute : PropertyAttribute, IEquatable<EditorFieldAttribute>
     {
         public string description;
@@ -30,10 +30,12 @@ namespace instance.id.EATK.Extensions
         /// <param name="Order"></param>
         /// <param name="ContainerType"></param>
         /// <param name="ContainerName"></param>
-        public EditorFieldAttribute(string Description = default, ContainerStyle ContainerType = default, string ContainerName = default,
+        /// <param name="foldoutOpen">Should foldout be closed by default</param>
+        public EditorFieldAttribute(string Description = default, ContainerType ContainerType = default, string ContainerName = default,
         int ContainerId = -1,
         int Order = -1,
-        string ToolTip = default)
+        string ToolTip = default,
+        bool foldoutOpen = false)
         {
             if (Description == default)
             {
@@ -49,9 +51,11 @@ namespace instance.id.EATK.Extensions
             container = new ContainerData
             {
                 order = Order,
+                foldoutOpen = foldoutOpen,
                 containerId = ContainerId,
                 containerType = ContainerType,
-                containerName = ContainerName
+                containerName = ContainerName,
+                containerClass = ContainerName?.Replace(" ", string.Empty)
             };
         }
  

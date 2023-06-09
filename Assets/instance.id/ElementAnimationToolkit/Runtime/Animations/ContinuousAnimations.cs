@@ -16,6 +16,12 @@ namespace instance.id.EATK
     {
         public static bool debug = false;
 
+        public static IVisualElementScheduledItem AnimBorderPulse(
+            this VisualElement element,
+            AnimValueStore<Color> valueStore)
+        {
+            return AnimBorderPulse(element, valueStore.initial, valueStore.final);
+        }
         // -------------------------------------------------- @HoverBorder
         // ---------------------------------------------------------------
         ///  <summary>

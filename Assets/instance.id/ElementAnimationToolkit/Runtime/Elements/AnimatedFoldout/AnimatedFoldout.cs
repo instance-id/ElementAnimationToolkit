@@ -6,6 +6,8 @@
 #if UNITY_EDITOR
 using System;
 using instance.id.EATK.Extensions;
+using UnityEditor;
+using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace instance.id.EATK
@@ -18,11 +20,29 @@ namespace instance.id.EATK
         internal static readonly string ussFoldoutDepthClassName = "unity-foldout--depth-";
         internal static readonly int ussFoldoutMaxDepth = 4;
         private Toggle m_Toggle;
-        private VisualElement m_Container;
         public Expander expander;
+        private VisualElement m_Container;
+        private VisualElement headerBorderLine;
+        private VisualElement resolvableElement;
+        private AnimValueStore<float> headerBorderValues;
+
         private bool m_Value;
         private bool isAnimating;
+        public bool toggleAsHeader = true;
+        public bool startExpand = false;
+        public bool disableAnimation = false;
+
         public Action stateChange = () => { };
+
+        public Action OnComplete
+        {
+            get => expander.onComplete;
+            set => expander.onComplete = value;
+        }
+
+        public int initialHeaderBorderWidth = default;
+        private int initialHeaderWidth;
+        public static readonly string toggleName = "ExpandToggle";
 
         /// <summary>
         ///   <para>USS class name of elements of this type.</para>
@@ -45,6 +65,7 @@ namespace instance.id.EATK
         public static readonly string expanderUssClassName = ussClassName + "__expander";
 
         private string toggleLabelUssClass;
+
         public string ToggleLabelUssClass
         {
             get => toggleLabelUssClass;
@@ -89,68 +110,161 @@ namespace instance.id.EATK
         public void SetValueWithoutNotify(bool newValue)
         {
             m_Value = newValue;
-            m_Toggle.value = m_Value;
+            value = newValue;
+            expander.startExpanded = newValue;
         }
 
         public AnimatedFoldout() => BuildFoldout();
-        public AnimatedFoldout(VisualElement headerElement, FlexDirection direction = FlexDirection.Column, Align alignSelf = default) => BuildFoldout(headerElement, direction, alignSelf);
+        public AnimatedFoldout(bool startExpanded = false) => BuildFoldout(startExpanded: startExpanded);
 
-        private void BuildFoldout(VisualElement headerElement = default, FlexDirection direction = FlexDirection.Column, Align alignSelf = default)
+        public AnimatedFoldout(VisualElement headerElement, FlexDirection direction = FlexDirection.Column, Align alignSelf = default) =>
+            BuildFoldout(headerElement, direction, alignSelf);
+
+        public AnimatedFoldout(VisualElement headerElement, bool replaceHeader, FlexDirection direction = FlexDirection.Column, Align alignSelf = default, VisualElement resolvableElement = default) =>
+            BuildFoldout(headerElement, direction, alignSelf, replaceHeader: replaceHeader, resolvable: resolvableElement, headerBorderWidth: 0);
+
+        private void BuildFoldout(
+            VisualElement headerElement = default,
+            FlexDirection direction = FlexDirection.Column,
+            Align alignSelf = default,
+            int headerBorderWidth = default,
+            bool startExpanded = false,
+            bool replaceHeader = default,
+            VisualElement resolvable = default)
         {
-            m_Value = true;
+            startExpand = startExpanded;
+            initialHeaderBorderWidth = headerBorderWidth;
+            resolvableElement = resolvable;
+            m_Value = false;
             AddToClassList(ussClassName);
             new Expander().Create(out expander).ToUSS(nameof(expander));
 
-            new Toggle { value = true }.Create(out m_Toggle).ToUSS(toggleUssClassName)
+            new VisualElement().Create(out headerBorderLine).ToUSS(nameof(headerBorderLine));
+            new Toggle {value = false, name = toggleName}.Create(out m_Toggle, name: toggleName).ToUSS(toggleUssClassName, "expandToggle")
                 .RegisterValueChangedCallback(evt =>
                 {
-                    value = m_Toggle.value;
+                    if (evt.currentTarget != evt.target) return;
+                    value = evt.newValue;
                     expander.Activate(value);
+                    if (toggleAsHeader)
+                        ToggleHeaderAnimation(value);
+
                     evt.StopPropagation();
                 });
 
+            m_Toggle.name = toggleName;
             hierarchy.Add(m_Toggle);
+            if (toggleAsHeader) hierarchy.Add(headerBorderLine);
+
+            var checkmarkParent = m_Toggle.Query("unity-checkmark").First().parent;
+            checkmarkParent.name = toggleAsHeader ? "ExpandToggleContainerHeader" : "ExpandToggleContainer";
+            checkmarkParent.AddToClassList(toggleAsHeader ? "expandToggleContainerHeader" : "expandToggleContainer");
+
             if (headerElement != default)
             {
-                m_Toggle.Add(headerElement);
-                m_Toggle.Query("unity-checkmark").First().parent.style.flexGrow = 0;
-                if (alignSelf != default) m_Toggle.style.alignSelf = alignSelf;
-                if (direction != FlexDirection.Column) style.flexDirection = direction;
+                if (direction == FlexDirection.Row)
+                {
+                    checkmarkParent.Add(headerElement);
+                    m_Toggle.contentContainer.Add(headerElement);
+                    checkmarkParent.style.flexGrow = 1;
+                }
+                else
+                {
+                    checkmarkParent.style.flexGrow = 0;
+                    if (alignSelf != default) m_Toggle.style.alignSelf = alignSelf;
+                }
             }
 
             new VisualElement().Create(out m_Container, "unity-content").ToUSS(contentUssClassName);
             expander.AddToExpansionGroup(m_Container);
             hierarchy.Add(expander);
+
+            expander.AddToClassList("variables");
+            expander.RegisterCallback<CustomStyleResolvedEvent>(OnCustomStyleResolved);
+
             RegisterCallback(new EventCallback<AttachToPanelEvent>(OnAttachToPanel));
-            RegisterCallback<GeometryChangedEvent>(DeferredExecution);
+            RegisterCallback<GeometryChangedEvent>(evt => DeferredExecution(evt, headerElement));
+            if (startExpand)
+                SetValueWithoutNotify(true);
         }
 
-        private void DeferredExecution(GeometryChangedEvent evt)
+        private void DeferredExecution(GeometryChangedEvent evt, VisualElement headerElement)
         {
-            UnregisterCallback<GeometryChangedEvent>(DeferredExecution);
+            UnregisterCallback<GeometryChangedEvent>(e => DeferredExecution(e, headerElement));
+            headerBorderLine.style.maxWidth = new StyleLength(Length.Percent(100));
+            GetStyles();
 
             var label = this.Query<Label>().First();
             label.AddToClassList("animatedFoldoutLabel");
             this.Query("unity-checkmark").First().style.alignSelf = Align.Center;
+            var foContainer = this.Query<VisualElement>("unity-foldout__content").First();
+
+            foContainer.style.flexShrink = 0;
+            foContainer.style.flexGrow = 1;
+
+            foContainer.contentContainer.Children().forEach(x => x.AddToClassList("expandContainerItem"));
+
+            if (disableAnimation) expander.animationTime = 0;
+            if (headerElement != default) headerElement.BringToFront();
         }
 
-        public VisualElement SetLabelClass(string ussClass)
+        // --| Get StyleSheet -------------------------------------------------
+        // --| ----------------------------------------------------------------
+        private void GetStyles()
         {
-            return this;
+            // ReSharper disable once Unity.UnknownResource
+            var sheet = Resources.Load<StyleSheet>("Style/AnimatedFoldoutStyle");
+            if (sheet != null) styleSheets.Add(sheet);
+            else Debug.Log("StyleSheet 'Style/AnimatedFoldoutStyle' not found");
         }
 
-        private void SetPickingMode(bool animating)
+        // --| Header Animation -----------------------------------------------
+        // --| ----------------------------------------------------------------
+        private void ToggleHeaderAnimation(bool val)
         {
-            m_Toggle.style.opacity = 1;
-            m_Toggle.SetEnabled(!animating);
+            float percent = default;
+            if (resolvableElement != null)
+            {
+                percent = resolvableElement.resolvedStyle.width;
+            }
+            else percent = (headerBorderLine.parent.resolvedStyle.width * 0.9999f);
+
+            if (headerBorderValues != null)
+            {
+                headerBorderValues.final = percent;
+                if (val)
+                {
+                    headerBorderLine.AddToClassList("headerBorderLineExpanded");
+                    headerBorderLine.Animate(headerBorderValues).OnCompleted(() =>
+                    {
+                        headerBorderLine.style.width = new StyleLength(StyleKeyword.Auto);
+                    });
+                }
+                else
+                {
+                    headerBorderLine.RemoveFromClassList("headerBorderLineExpanded");
+                    headerBorderLine.Animate(headerBorderValues, reverse: true);
+                }
+            }
         }
 
-        public void Expand(bool expandValue) => value = expandValue;
+        // --| Manually Expand/Collapse -------------------
+        // --|---------------------------------------------
         public void Expand() => value = !value;
+        public void Expand(bool expandValue, bool animate = true)
+        {
+#if UNITY_EDITOR
+            EditorApplication.delayCall += () =>
+            {
+#endif
+                expander.Animate = animate;
+                m_Toggle.value = expandValue;
+#if UNITY_EDITOR
+            };
+#endif
+        }
 
-        /// <summary>
-        /// Manually trigger expansion or collapse of the expansion group via parameter
-        /// </summary>
+        /// <summary> Manually trigger expansion or collapse of the expansion group via parameter </summary>
         /// <param name="rootElement">The root visual element of the binding object</param>
         public void ActivateOnStart(VisualElement rootElement) =>
             rootElement.RegisterCallback<GeometryChangedEvent>(evt => DoActivationOnStart(evt, rootElement));
@@ -159,7 +273,7 @@ namespace instance.id.EATK
         private void DoActivationOnStart(GeometryChangedEvent evt, VisualElement visualElement)
         {
             visualElement.UnregisterCallback<GeometryChangedEvent>(e => DoActivationOnStart(evt, visualElement));
-            value = true;
+            visualElement.schedule.Execute(() => { value = true; }).StartingIn(0);
         }
 
         private void OnAttachToPanel(AttachToPanelEvent evt)
@@ -181,6 +295,39 @@ namespace instance.id.EATK
                 AddToClassList(ussFoldoutDepthClassName + "max");
             else
                 AddToClassList(ussFoldoutDepthClassName + num);
+        }
+
+        // --| Custom Event Handlers --------------------------------
+        // --| ------------------------------------------------------
+        static readonly CustomStyleProperty<string> k_headerBorderWidth = new CustomStyleProperty<string>("--headerBorderWidth");
+        private bool widthIsSet;
+        void OnCustomStyleResolved(CustomStyleResolvedEvent e)
+        {
+            if (widthIsSet) return;
+            if (initialHeaderBorderWidth != default)
+            {
+                widthIsSet = true;
+                var width = headerBorderLine.parent.resolvedStyle.width;
+                headerBorderValues = new AnimValueStore<float>(AnimateElement.Width, initialHeaderBorderWidth, width, 500);
+                return;
+            }
+
+            if (e.customStyle.TryGetValue(k_headerBorderWidth, out var headerWidth))
+            {
+                initialHeaderWidth = int.Parse(headerWidth.Replace("px", ""));
+                headerBorderLine.style.width = initialHeaderWidth;
+
+                var width = headerBorderLine.parent.resolvedStyle.width;
+                headerBorderValues = new AnimValueStore<float>(AnimateElement.Width, initialHeaderWidth, width, 500);
+            }
+        }
+
+        public VisualElement SetLabelClass(string ussClass) => this;
+
+        private void SetPickingMode(bool animating)
+        {
+            m_Toggle.style.opacity = 1;
+            m_Toggle.SetEnabled(!animating);
         }
 
         /// <summary>

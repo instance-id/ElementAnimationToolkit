@@ -1,0 +1,45 @@
+/* ---------------------------------------------- */
+/* containers */
+/* ---------------------------------------------- */
+.variables {
+  --headerBorderWidth: 0px;
+}
+
+.animatedFoldout {
+  border-radius: 4px;
+}
+
+.headerBorderLine {
+  margin: -4px 0px 8px;
+  height: 1px;
+  width: var(--headerBorderWidth);
+  border-bottom-width: 1px;
+  border-bottom-color: rgba(150, 150, 150, 0.2);
+}
+
+.headerBorderLineExpanded {
+  border-bottom-color: rgba(255, 255, 255, 0.2);
+}
+
+.expandToggleContainerHeader {
+  padding: 1px 0 3px 3px;
+  margin-left: 0;
+}
+
+.expandContainerItem {
+  flex-shrink: 0;
+  flex-grow: 1;
+}
+
+.expandToggle {
+  margin-left: 0;
+  border-top-left-radius: 4px;
+  border-top-right-radius: 4px;
+}
+
+.spacerColumn {
+  min-height: 100%;
+}
+
+/* -- AnimatedFoldoutStyle ---------------------- */
+/* ---------------------------------------------- */

@@ -3,11 +3,15 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using UnityEngine;
+using UnityObject = UnityEngine.Object;
 
 namespace instance.id.EATK.Extensions
 {
+    // ReSharper disable once IdentifierTypo
     public static class ReflectionExten
     {
+        private const BindingFlags AllFlags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance | BindingFlags.FlattenHierarchy;
+
         /// <summary>
         /// Get attributes from a class
         /// </summary>
@@ -15,7 +19,7 @@ namespace instance.id.EATK.Extensions
         /// <param name="sortOutput"></param>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        public static ClassData<T> GetEditorAttributes<T>(this object obj, bool sortOutput = false) where T : Attribute, new()
+        public static ClassData<T> GetEditorAttributes<T>(this UnityObject obj, bool sortOutput = false) where T : Attribute, new()
         {
             var thisType = obj.GetType();
             var classData = new ClassData<T>(thisType);
@@ -49,6 +53,18 @@ namespace instance.id.EATK.Extensions
 
             sb.Append('>');
             return sb.ToString();
+        }
+        
+        public static object InvokeMethod(this object obj, string methodName, params object[] arguments)
+        {
+            var methods = obj.GetType().GetMethods(AllFlags);
+            for (int i = 0; i < methods.Length; i++)
+            {
+                var method = methods[i];
+                if (method.Name == methodName && method.GetParameters().Length == arguments.Length) return method.Invoke(obj, arguments);
+            }
+
+            return null;
         }
     }
 }
